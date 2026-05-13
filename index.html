@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嘉義天巍宮 — 官方報名系統</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c9960c;--gold-light:#f5d76e;--gold-dark:#8a6500;
+  --red:#8B1A1A;--red-light:#c0392b;--red-dark:#5c0f0f;
+  --ink:#2c1810;--ink-muted:#6b4c3b;
+  --surface:#fff9f0;--border:rgba(180,130,30,0.25);
+}
+html{scroll-behavior:smooth}
+body{font-family:'Noto Serif TC',serif;background:#f0e4cc;min-height:100vh;color:var(--ink)}
+
+/* HEADER */
+.header{background:linear-gradient(160deg,#3d0a0a 0%,#6b1212 35%,#8B1A1A 65%,#6b1212 100%);padding:2rem 1rem 1.5rem;text-align:center;position:relative;overflow:hidden}
+.header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 20px,rgba(201,150,12,0.05) 20px,rgba(201,150,12,0.05) 22px)}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#f5d76e 30%,#f5d76e 70%,transparent)}
+.logo-char{font-size:clamp(30px,8vw,50px);font-weight:700;color:#f5d76e;letter-spacing:8px;text-shadow:0 2px 12px rgba(0,0,0,0.5);display:block;line-height:1.2;position:relative;z-index:1}
+.logo-en{font-size:11px;color:rgba(245,215,110,0.6);letter-spacing:5px;margin-top:4px;font-family:'Noto Sans TC',sans-serif;position:relative;z-index:1}
+.gold-line{height:1px;background:linear-gradient(90deg,transparent,rgba(245,215,110,0.6),transparent);margin:10px auto;width:200px;position:relative;z-index:1}
+.header-sub{font-size:11px;color:rgba(245,215,110,0.55);letter-spacing:3px;font-family:'Noto Sans TC',sans-serif;position:relative;z-index:1}
+
+/* NAV */
+nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position:sticky;top:0;z-index:100}
+.nav-btn{flex:1;padding:13px 4px;background:none;border:none;cursor:pointer;color:rgba(245,215,110,0.5);font-size:clamp(11px,2.8vw,13px);letter-spacing:1px;font-family:'Noto Serif TC',serif;transition:all 0.2s;border-right:1px solid rgba(201,150,12,0.12);display:flex;align-items:center;justify-content:center;gap:4px}
+.nav-btn:last-child{border-right:none}
+.nav-btn.active{color:#f5d76e;background:rgba(201,150,12,0.12);font-weight:700}
+
+/* LAYOUT */
+.page{display:none;max-width:680px;margin:0 auto;padding:1.5rem 1rem 4rem}
+.page.active{display:block}
+.section-title{font-size:14px;font-weight:700;color:var(--red);letter-spacing:4px;text-align:center;margin:0 0 1.25rem;display:flex;align-items:center;justify-content:center;gap:10px}
+.section-title::before,.section-title::after{content:'';flex:1;height:1px}
+.section-title::before{background:linear-gradient(90deg,transparent,var(--gold))}
+.section-title::after{background:linear-gradient(90deg,var(--gold),transparent)}
+
+/* STEPS */
+.steps{display:flex;justify-content:center;align-items:flex-start;margin:1.25rem 0 1.5rem}
+.step-wrap{display:flex;flex-direction:column;align-items:center;gap:4px}
+.step-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:white;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-muted);font-weight:700;transition:all 0.3s}
+.step-dot.done{background:var(--red);border-color:var(--red);color:white}
+.step-dot.active{background:var(--gold);border-color:var(--gold);color:var(--ink)}
+.step-label{font-size:10px;color:var(--ink-muted);letter-spacing:1px;white-space:nowrap}
+.step-line{width:clamp(20px,6vw,40px);height:2px;background:var(--border);margin-top:16px;transition:background 0.3s}
+.step-line.done{background:var(--red)}
+
+/* CARD */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--gold))}
+
+/* ACTIVITY CARDS */
+.act-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.act-card{background:var(--surface);border:1.5px solid var(--border);border-radius:12px;padding:1.1rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden;text-align:center}
+.act-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--gold))}
+.act-card:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:0 4px 16px rgba(139,26,26,0.1)}
+.act-card.selected{border-color:var(--gold);background:#fffde8;box-shadow:0 0 0 3px rgba(201,150,12,0.25)}
+.act-icon{font-size:28px;margin-bottom:8px}
+.act-title{font-size:13px;font-weight:700;color:var(--ink);letter-spacing:1px;margin-bottom:4px}
+.act-desc{font-size:11px;color:var(--ink-muted);line-height:1.6}
+.act-price{font-size:14px;font-weight:700;color:var(--red);margin-top:8px}
+
+/* FORM */
+.fsec-title{font-size:11px;color:var(--gold-dark);letter-spacing:2px;font-weight:700;margin-bottom:10px;font-family:'Noto Sans TC',sans-serif}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.form-row.full{grid-template-columns:1fr}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:11px;color:var(--ink-muted);letter-spacing:1px;font-family:'Noto Sans TC',sans-serif}
+.form-group input,.form-group select,.form-group textarea{border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-size:13px;background:white;color:var(--ink);font-family:'Noto Sans TC',sans-serif;transition:border-color 0.2s;-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,150,12,0.12)}
+.form-group textarea{min-height:70px;resize:none;line-height:1.6}
+.req{color:var(--red-light)}
+
+/* MULTI SELECT */
+.ms-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ms-btn{border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;cursor:pointer;background:white;color:var(--ink);transition:all 0.15s;font-family:'Noto Sans TC',sans-serif}
+.ms-btn:hover{border-color:var(--gold)}
+.ms-btn.sel{background:var(--red);border-color:var(--red);color:white}
+
+/* PAYMENT */
+.pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+.pay-card{border:1.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;background:white;text-align:center}
+.pay-card:hover{border-color:var(--gold)}
+.pay-card.selected{border-color:var(--gold);background:#fffde8;box-shadow:0 0 0 3px rgba(201,150,12,0.2)}
+.pay-icon{font-size:22px;margin-bottom:5px}
+.pay-name{font-size:12px;font-weight:700;color:var(--ink)}
+.pay-desc{font-size:10px;color:var(--ink-muted);margin-top:2px;font-family:'Noto Sans TC',sans-serif}
+.pay-detail{background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
+.pay-detail.show{display:block}
+.pay-detail-title{font-size:12px;color:var(--gold-dark);font-weight:700;margin-bottom:8px;font-family:'Noto Sans TC',sans-serif}
+.bank-info{font-size:12px;color:var(--ink);line-height:2.2;font-family:'Noto Sans TC',sans-serif}
+.bank-info strong{color:var(--red);font-weight:700}
+.qr-box{width:110px;height:110px;border:2px dashed var(--gold);border-radius:10px;display:flex;align-items:center;justify-content:center;margin:10px auto;color:var(--ink-muted);font-size:10px;text-align:center;line-height:1.6;font-family:'Noto Sans TC',sans-serif}
+.upload-zone{border:2px dashed var(--border);border-radius:10px;padding:1rem;text-align:center;cursor:pointer;transition:all 0.2s;margin-top:8px;background:white}
+.upload-zone:hover{border-color:var(--gold);background:#fffde8}
+.u-icon{font-size:26px;color:var(--gold)}
+.upload-zone p{font-size:11px;color:var(--ink-muted);margin-top:4px;line-height:1.6;font-family:'Noto Sans TC',sans-serif}
+.upload-zone input{display:none}
+.preview-box{display:none;margin-top:8px;text-align:center}
+.preview-box img{max-width:100%;max-height:160px;border-radius:8px;border:1px solid var(--border)}
+.preview-ok{font-size:11px;color:green;margin-top:4px;font-family:'Noto Sans TC',sans-serif}
+
+/* SUMMARY */
+.summary-box{background:#2c1810;border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.sum-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(201,150,12,0.12);font-size:12px;font-family:'Noto Sans TC',sans-serif}
+.sum-row:last-of-type{border-bottom:none}
+.sum-label{color:rgba(245,215,110,0.65)}
+.sum-val{color:#f5d76e;font-weight:600}
+.sum-total{display:flex;justify-content:space-between;align-items:center;padding-top:10px;margin-top:6px;border-top:1px solid var(--gold)}
+.sum-total .tl{color:#f5d76e;font-weight:700;font-size:13px;font-family:'Noto Sans TC',sans-serif}
+.sum-total .ta{color:#f5d76e;font-weight:700;font-size:22px}
+
+/* BUTTONS */
+.btn-primary{width:100%;padding:14px;background:linear-gradient(135deg,#6b1212,#8B1A1A);border:none;border-radius:10px;color:#f5d76e;font-size:14px;font-weight:700;letter-spacing:3px;cursor:pointer;transition:all 0.2s;font-family:'Noto Serif TC',serif;box-shadow:0 4px 16px rgba(139,26,26,0.25)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,26,26,0.35)}
+.btn-secondary{flex:1;padding:12px;border:1px solid var(--border);border-radius:10px;background:white;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--ink-muted)}
+.btn-secondary:hover{background:#fffde8}
+.btn-row{display:flex;gap:10px;margin-top:8px}
+
+/* NOTICE */
+.info-notice{background:#fffde8;border:1px solid var(--gold);border-radius:8px;padding:10px 12px;font-size:11px;color:var(--ink-muted);line-height:1.8;margin-bottom:12px;font-family:'Noto Sans TC',sans-serif}
+.info-notice strong{color:var(--red)}
+
+/* SUCCESS */
+@keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.success-screen{text-align:center;padding:3rem 1rem;display:none;animation:fadeIn 0.5s ease}
+.success-screen.show{display:block}
+.success-icon{font-size:56px;margin-bottom:1rem}
+.success-title{font-size:22px;color:var(--red);font-weight:700;letter-spacing:5px;margin-bottom:8px}
+.success-no{font-size:20px;color:var(--gold-dark);font-weight:700;margin:1rem 0;letter-spacing:3px;font-family:'Noto Sans TC',sans-serif}
+.success-sub{font-size:12px;color:var(--ink-muted);line-height:2;font-family:'Noto Sans TC',sans-serif}
+
+/* LAMP */
+.lamp-ctrl{display:flex;gap:8px;align-items:center;margin-top:6px}
+.lamp-btn{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;background:white;cursor:pointer;font-size:18px;color:var(--red);font-weight:700;font-family:inherit}
+.lamp-btn:hover{border-color:var(--gold);background:#fffde8}
+.lamp-count{font-size:20px;font-weight:700;color:var(--red);min-width:36px;text-align:center;font-family:'Noto Sans TC',sans-serif}
+
+/* STEP FORM */
+.step-form{display:none}
+.step-form.active{display:block;animation:fadeIn 0.3s ease}
+
+/* QUERY */
+.query-result{margin-top:1rem;border-top:1px solid var(--border);padding-top:1rem;display:none}
+.query-result.show{display:block}
+.res-row{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;font-family:'Noto Sans TC',sans-serif}
+.res-row:last-child{border:none}
+.res-key{color:var(--ink-muted)}
+.res-val{color:var(--ink);font-weight:600}
+
+/* INFO */
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:10px}
+.info-card-title{font-size:12px;color:var(--gold-dark);letter-spacing:2px;font-weight:700;margin-bottom:8px;font-family:'Noto Sans TC',sans-serif}
+.info-card p{font-size:12px;color:var(--ink);line-height:2.2;font-family:'Noto Sans TC',sans-serif}
+
+/* BADGE */
+.badge{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:600;display:inline-block;font-family:'Noto Sans TC',sans-serif}
+.badge.ok{background:#d4edda;color:#155724}
+.badge.wait{background:#fff3cd;color:#856404}
+.badge.rev{background:#d1ecf1;color:#0c5460}
+
+/* DASHBOARD */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:1rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1rem;text-align:center;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--red),var(--gold))}
+.stat-num{font-size:30px;font-weight:700;color:var(--red);font-family:'Noto Sans TC',sans-serif}
+.stat-label{font-size:10px;color:var(--ink-muted);letter-spacing:2px;margin-top:2px;font-family:'Noto Sans TC',sans-serif}
+.chart-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.chart-title{font-size:11px;color:var(--gold-dark);letter-spacing:2px;font-weight:700;margin-bottom:12px;font-family:'Noto Sans TC',sans-serif}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.bar-label{font-size:11px;color:var(--ink);width:75px;text-align:right;flex-shrink:0;font-family:'Noto Sans TC',sans-serif}
+.bar-track{flex:1;background:rgba(201,150,12,0.1);border-radius:4px;height:20px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:8px;font-size:10px;color:white;font-weight:700;font-family:'Noto Sans TC',sans-serif;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);width:0}
+.bar-fill.red{background:linear-gradient(90deg,var(--red-dark),var(--red-light))}
+.bar-fill.gold{background:linear-gradient(90deg,var(--gold-dark),var(--gold))}
+.rec-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'Noto Sans TC',sans-serif}
+.rec-table th{background:#2c1810;color:#f5d76e;padding:7px 8px;text-align:left;font-weight:600;letter-spacing:1px}
+.rec-table td{padding:8px;border-bottom:1px solid var(--border);color:var(--ink)}
+.rec-table tr:hover td{background:#fffde8}
+
+/* ADMIN MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(30,10,10,0.8);z-index:999;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex;animation:fadeIn 0.25s ease}
+.modal-box{background:white;border-radius:16px;padding:2rem 1.5rem;width:min(340px,90vw);text-align:center;position:relative;overflow:hidden}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),var(--gold))}
+.modal-icon{font-size:36px;margin-bottom:10px}
+.modal-title{font-size:16px;font-weight:700;color:var(--red);letter-spacing:3px;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--ink-muted);margin-bottom:1.25rem;font-family:'Noto Sans TC',sans-serif}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:16px;text-align:center;letter-spacing:4px;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px}
+.modal-input:focus{outline:none;border-color:var(--gold)}
+.modal-err{font-size:11px;color:var(--red-light);margin-bottom:10px;display:none;font-family:'Noto Sans TC',sans-serif}
+.modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,#6b1212,#8B1A1A);border:none;border-radius:8px;color:#f5d76e;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif}
+.modal-cancel{background:none;border:none;font-size:11px;color:var(--ink-muted);cursor:pointer;margin-top:10px;font-family:'Noto Sans TC',sans-serif;display:block;width:100%;padding:6px}
+
+/* ADMIN BAR */
+.admin-bar-wrap{background:#2c1810;border-bottom:1px solid var(--gold);display:none}
+.admin-bar-inner{max-width:680px;margin:0 auto;padding:10px 1rem;display:flex;align-items:center;justify-content:space-between}
+.admin-bar-title{color:#f5d76e;font-size:12px;letter-spacing:2px;font-family:'Noto Sans TC',sans-serif;font-weight:600}
+.admin-logout{background:none;border:1px solid rgba(245,215,110,0.3);border-radius:6px;color:rgba(245,215,110,0.7);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.admin-logout:hover{border-color:var(--gold);color:#f5d76e}
+
+/* FOOTER */
+footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgba(245,215,110,0.35);font-size:10px;letter-spacing:2px;font-family:'Noto Sans TC',sans-serif}
+.admin-entry{background:none;border:none;color:rgba(245,215,110,0.18);font-size:10px;cursor:pointer;letter-spacing:1px;font-family:'Noto Sans TC',sans-serif;padding:8px 12px;margin-top:8px;transition:color 0.3s;display:inline-block}
+.admin-entry:hover{color:rgba(245,215,110,0.55)}
+
+@media(max-width:480px){
+  .act-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .logo-char{letter-spacing:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- 管理員 Modal -->
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">管理員登入</div>
+    <div class="modal-sub">請輸入管理員密碼</div>
+    <input type="password" class="modal-input" id="admin-pw" placeholder="••••••" maxlength="30"
+      onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-err" id="pw-err">❌ 密碼錯誤，請再試一次</div>
+    <button class="modal-btn" onclick="checkPw()">進入管理介面</button>
+    <button class="modal-cancel" onclick="closeModal()">取消</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <span class="logo-char">嘉義天巍宮</span>
+  <div class="logo-en">TIAN WEI GONG · CHIAYI</div>
+  <div class="gold-line"></div>
+  <div class="header-sub">數位報名系統</div>
+</header>
+
+<!-- 管理員列（登入後顯示） -->
+<div class="admin-bar-wrap" id="admin-bar">
+  <div class="admin-bar-inner">
+    <span class="admin-bar-title">🔑 管理員模式</span>
+    <button class="admin-logout" onclick="adminLogout()">⬅ 登出</button>
+  </div>
+</div>
+
+<!-- 公開 NAV（信徒）-->
+<nav id="public-nav">
+  <button class="nav-btn active" onclick="switchPage('register')" id="tab-register">📋 活動報名</button>
+  <button class="nav-btn" onclick="switchPage('query')" id="tab-query">🔍 查詢進度</button>
+  <button class="nav-btn" onclick="switchPage('info')" id="tab-info">🏛️ 宮廟資訊</button>
+</nav>
+
+<!-- ══ 報名頁 ══ -->
+<div class="page active" id="page-register">
+  <div class="steps" id="steps-indicator" style="margin-top:1.25rem">
+    <div class="step-wrap"><div class="step-dot active" id="sd1">1</div><div class="step-label">選擇</div></div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd2">2</div><div class="step-label">填寫</div></div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd3">3</div><div class="step-label">付款</div></div>
+    <div class="step-line" id="sl3"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd4">4</div><div class="step-label">確認</div></div>
+  </div>
+
+  <!-- S1 選擇活動 -->
+  <div class="step-form active" id="sf1">
+    <div class="section-title">選擇報名項目</div>
+    <div class="act-grid">
+      <div class="act-card" id="act-jx" onclick="selAct('jx')">
+        <div class="act-icon">🏮</div>
+        <div class="act-title">進香報名</div>
+        <div class="act-desc">隨駕進香活動<br>含交通、住宿安排</div>
+        <div class="act-price">$ 2,000 ／人</div>
+      </div>
+      <div class="act-card" id="act-dl" onclick="selAct('dl')">
+        <div class="act-icon">🕯️</div>
+        <div class="act-title">十二元神改厄燈</div>
+        <div class="act-desc">點燈祈福消災<br>依生肖元神安排</div>
+        <div class="act-price">$ 600 ／盞</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goStep(2)">下一步 →</button>
+  </div>
+
+  <!-- S2 填寫資料 -->
+  <div class="step-form" id="sf2">
+    <div class="section-title">填寫報名資料</div>
+    <!-- 進香 -->
+    <div id="form-jx" style="display:none">
+      <div class="card">
+        <div class="fsec-title">🙏 報名人資料</div>
+        <div class="form-row">
+          <div class="form-group"><label>姓名 <span class="req">*</span></label><input type="text" id="jx-name" placeholder="請輸入姓名"></div>
+          <div class="form-group"><label>性別 <span class="req">*</span></label>
+            <select id="jx-gender"><option value="">請選擇</option><option>男</option><option>女</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>出生年月日 <span class="req">*</span></label><input type="date" id="jx-birth"></div>
+          <div class="form-group"><label>聯絡電話 <span class="req">*</span></label><input type="tel" id="jx-phone" placeholder="09XX-XXXXXX"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>通訊地址</label><input type="text" id="jx-addr" placeholder="縣市鄉鎮區路段門號"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>葷素 ／ 飲食需求</label>
+            <div class="ms-row">
+              <button class="ms-btn" onclick="togMS(this)">葷食</button>
+              <button class="ms-btn" onclick="togMS(this)">素食</button>
+              <button class="ms-btn" onclick="togMS(this)">純素</button>
+              <button class="ms-btn" onclick="togMS(this)">海鮮過敏</button>
+              <button class="ms-btn" onclick="togMS(this)">無特殊需求</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>備註事項</label><textarea id="jx-note" placeholder="如身體狀況、特殊需求、交通接送點等..."></textarea></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fsec-title">👨‍👩‍👧 同行人員（選填）</div>
+        <div id="companions-list"></div>
+        <button onclick="addCompanion()" style="width:100%;padding:8px;border:1.5px dashed var(--gold);border-radius:8px;background:none;font-size:12px;color:var(--gold-dark);cursor:pointer;font-family:'Noto Sans TC',sans-serif;margin-top:4px">＋ 新增同行人員</button>
+      </div>
+    </div>
+    <!-- 改厄燈 -->
+    <div id="form-dl" style="display:none">
+      <div class="card">
+        <div class="fsec-title">🕯️ 點燈人資料</div>
+        <div class="form-row">
+          <div class="form-group"><label>姓名 <span class="req">*</span></label><input type="text" id="dl-name" placeholder="請輸入姓名"></div>
+          <div class="form-group"><label>聯絡電話 <span class="req">*</span></label><input type="tel" id="dl-phone" placeholder="09XX-XXXXXX"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>出生年 <span class="req">*</span></label><input type="number" id="dl-year" placeholder="例：1985" min="1920" max="2025"></div>
+          <div class="form-group"><label>生肖 <span class="req">*</span></label>
+            <select id="dl-zodiac" onchange="autoDeity()">
+              <option value="">請選擇</option>
+              <option>鼠</option><option>牛</option><option>虎</option><option>兔</option>
+              <option>龍</option><option>蛇</option><option>馬</option><option>羊</option>
+              <option>猴</option><option>雞</option><option>狗</option><option>豬</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>主祀元神（依生肖自動帶入）</label>
+            <input type="text" id="dl-deity" readonly placeholder="請先選擇生肖" style="background:#f9f5ee;color:var(--red);font-weight:700">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>祈求事項</label>
+            <div class="ms-row">
+              <button class="ms-btn" onclick="togMS(this)">平安健康</button>
+              <button class="ms-btn" onclick="togMS(this)">財運亨通</button>
+              <button class="ms-btn" onclick="togMS(this)">學業進步</button>
+              <button class="ms-btn" onclick="togMS(this)">姻緣美滿</button>
+              <button class="ms-btn" onclick="togMS(this)">事業順遂</button>
+              <button class="ms-btn" onclick="togMS(this)">消災解厄</button>
+              <button class="ms-btn" onclick="togMS(this)">全家平安</button>
+            </div>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>點燈數量</label>
+            <div class="lamp-ctrl">
+              <button class="lamp-btn" onclick="chgLamp(-1)">－</button>
+              <span class="lamp-count" id="lamp-n">1</span>
+              <button class="lamp-btn" onclick="chgLamp(1)">＋</button>
+              <span style="font-size:11px;color:var(--ink-muted);font-family:'Noto Sans TC',sans-serif">盞（每盞 $600，小計：<strong id="lamp-amt" style="color:var(--red)">$600</strong>）</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)">← 返回</button>
+      <button class="btn-primary" style="flex:2" onclick="goStep(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- S3 付款 -->
+  <div class="step-form" id="sf3">
+    <div class="section-title">選擇付款方式</div>
+    <div class="info-notice">⚠️ <strong>重要提醒：</strong>本系統採「先付款、後確認」制度。請完成付款並上傳憑證後，工作人員將於 <strong>24 小時內</strong>審核確認，並以電話通知。</div>
+    <div class="pay-grid">
+      <div class="pay-card" id="pm-atm" onclick="selPay('atm')"><div class="pay-icon">🏦</div><div class="pay-name">ATM 轉帳</div><div class="pay-desc">網銀 ／ 臨櫃</div></div>
+      <div class="pay-card" id="pm-line" onclick="selPay('line')"><div class="pay-icon">💚</div><div class="pay-name">LINE Pay</div><div class="pay-desc">掃碼即付</div></div>
+      <div class="pay-card" id="pm-street" onclick="selPay('street')"><div class="pay-icon">🟠</div><div class="pay-name">街口支付</div><div class="pay-desc">掃碼即付</div></div>
+      <div class="pay-card" id="pm-onsite" onclick="selPay('onsite')"><div class="pay-icon">🏛️</div><div class="pay-name">現場繳費</div><div class="pay-desc">蒞臨宮廟</div></div>
+    </div>
+    <div class="pay-detail" id="pd-atm">
+      <div class="pay-detail-title">🏦 ATM 轉帳帳號</div>
+      <div class="bank-info">銀行：<strong>第一銀行（007）</strong><br>帳號：<strong>123-456-789012</strong><br>戶名：<strong>天巍宮管理委員會</strong><br><span style="color:#856404;font-size:11px">請於 3 日內完成轉帳並上傳截圖</span></div>
+      <div class="upload-zone" onclick="document.getElementById('up-atm').click()">
+        <div class="u-icon">📤</div><p>點擊上傳匯款截圖（jpg / png，最大 5MB）</p>
+        <input type="file" id="up-atm" accept="image/*" onchange="showPrev(this,'pv-atm')">
+      </div>
+      <div class="preview-box" id="pv-atm"><img id="pv-atm-img"><div class="preview-ok">✓ 截圖已上傳</div></div>
+    </div>
+    <div class="pay-detail" id="pd-line">
+      <div class="pay-detail-title">💚 LINE Pay 付款</div>
+      <div class="qr-box">LINE Pay<br>QR Code<br>（請向宮廟索取）</div>
+      <p style="font-size:11px;color:var(--ink-muted);text-align:center;font-family:'Noto Sans TC',sans-serif">掃描後付款完成，截圖上傳即可</p>
+      <div class="upload-zone" style="margin-top:10px" onclick="document.getElementById('up-line').click()">
+        <div class="u-icon">📤</div><p>上傳付款完成截圖</p>
+        <input type="file" id="up-line" accept="image/*" onchange="showPrev(this,'pv-line')">
+      </div>
+      <div class="preview-box" id="pv-line"><img id="pv-line-img"><div class="preview-ok">✓ 截圖已上傳</div></div>
+    </div>
+    <div class="pay-detail" id="pd-street">
+      <div class="pay-detail-title">🟠 街口支付</div>
+      <div class="qr-box">街口支付<br>QR Code<br>（請向宮廟索取）</div>
+      <p style="font-size:11px;color:var(--ink-muted);text-align:center;font-family:'Noto Sans TC',sans-serif">掃描後付款完成，截圖上傳即可</p>
+      <div class="upload-zone" style="margin-top:10px" onclick="document.getElementById('up-street').click()">
+        <div class="u-icon">📤</div><p>上傳付款完成截圖</p>
+        <input type="file" id="up-street" accept="image/*" onchange="showPrev(this,'pv-street')">
+      </div>
+      <div class="preview-box" id="pv-street"><img id="pv-street-img"><div class="preview-ok">✓ 截圖已上傳</div></div>
+    </div>
+    <div class="pay-detail" id="pd-onsite">
+      <div class="pay-detail-title">🏛️ 現場繳費說明</div>
+      <div class="bank-info">地址：<strong>嘉義縣○○鄉○○路○號</strong><br>服務時間：<strong>週一至週日 09:00 – 17:00</strong><br>聯絡電話：<strong>05-XXX-XXXX</strong><br><span style="color:#856404;font-size:11px">現場繳費後將立即確認報名，無需上傳截圖</span></div>
+    </div>
+    <div class="btn-row" style="margin-top:1rem">
+      <button class="btn-secondary" onclick="goStep(2)">← 返回</button>
+      <button class="btn-primary" style="flex:2" onclick="goStep(4)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- S4 確認 -->
+  <div class="step-form" id="sf4">
+    <div class="section-title">確認報名資料</div>
+    <div class="summary-box">
+      <div class="sum-row"><span class="sum-label">活動類型</span><span class="sum-val" id="sum-type">—</span></div>
+      <div class="sum-row"><span class="sum-label">報名人姓名</span><span class="sum-val" id="sum-name">—</span></div>
+      <div class="sum-row"><span class="sum-label">聯絡電話</span><span class="sum-val" id="sum-phone">—</span></div>
+      <div class="sum-row"><span class="sum-label">付款方式</span><span class="sum-val" id="sum-pay">—</span></div>
+      <div class="sum-row"><span class="sum-label">項目數量</span><span class="sum-val" id="sum-qty">—</span></div>
+      <div class="sum-total"><span class="tl">應付金額</span><span class="ta" id="sum-total-amt">$0</span></div>
+    </div>
+    <div class="info-notice">✅ 送出後系統將產生<strong>專屬報名編號</strong>，請記下以便查詢進度。<br>工作人員確認付款後，將以電話通知報名確認結果。</div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(3)">← 返回</button>
+      <button class="btn-primary" style="flex:2" onclick="submitForm()">🙏 確認送出報名</button>
+    </div>
+  </div>
+
+  <!-- 成功畫面 -->
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🏮</div>
+    <div class="success-title">報名成功！</div>
+    <div class="success-no" id="success-no">編號：TW-000000</div>
+    <div class="success-sub">感謝您的虔誠報名，神明必定庇佑！<br>工作人員將於 <strong>24 小時內</strong> 確認付款<br>並以電話通知報名確認結果<br><br><span style="font-size:10px">請記下您的報名編號，可至「查詢進度」頁面查詢</span></div>
+    <button onclick="resetForm()" style="margin-top:1.5rem;padding:10px 28px;background:var(--red);border:none;border-radius:8px;color:#f5d76e;font-size:13px;cursor:pointer;font-family:'Noto Serif TC',serif;letter-spacing:2px">繼續報名</button>
+  </div>
+</div>
+
+<!-- ══ 查詢頁 ══ -->
+<div class="page" id="page-query">
+  <div class="section-title" style="margin-top:1.25rem">報名進度查詢</div>
+  <div class="card">
+    <div class="form-group" style="margin-bottom:10px">
+      <label>報名編號</label>
+      <input type="text" id="q-no" placeholder="請輸入編號，如：TW-240528">
+    </div>
+    <div class="form-group" style="margin-bottom:14px">
+      <label>報名人電話後 4 碼驗證</label>
+      <input type="tel" id="q-phone" placeholder="後4碼" maxlength="4">
+    </div>
+    <button class="btn-primary" onclick="queryStatus()" style="letter-spacing:2px;font-size:13px">🔍 查詢進度</button>
+    <div class="query-result" id="q-result">
+      <div class="fsec-title" style="margin-bottom:8px">查詢結果</div>
+      <div class="res-row"><span class="res-key">報名編號</span><span class="res-val">TW-240528</span></div>
+      <div class="res-row"><span class="res-key">活動類型</span><span class="res-val">進香報名</span></div>
+      <div class="res-row"><span class="res-key">報名人</span><span class="res-val">王○○</span></div>
+      <div class="res-row"><span class="res-key">付款方式</span><span class="res-val">ATM 轉帳</span></div>
+      <div class="res-row"><span class="res-key">付款狀態</span><span class="res-val"><span class="badge ok">已確認</span></span></div>
+      <div class="res-row"><span class="res-key">報名狀態</span><span class="res-val"><span class="badge ok">✓ 報名成功</span></span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 宮廟資訊 ══ -->
+<div class="page" id="page-info">
+  <div class="section-title" style="margin-top:1.25rem">天巍宮資訊</div>
+  <div class="info-card"><div class="info-card-title">📍 地址與交通</div><p>地址：嘉義縣○○鄉○○路○號<br>公車：搭乘至○○站下車，步行約 5 分鐘<br>停車：宮廟前廣場可停約 50 輛</p></div>
+  <div class="info-card"><div class="info-card-title">🕘 開放時間</div><p>平日（週一至週五）：06:00 – 21:00<br>假日（週六、週日）：05:30 – 21:30<br>辦公服務時間：09:00 – 17:00</p></div>
+  <div class="info-card"><div class="info-card-title">📞 聯絡資訊</div><p>電話：05-XXX-XXXX<br>LINE 官方帳號：@tianweigong<br>Facebook：嘉義天巍宮</p></div>
+  <div class="info-card"><div class="info-card-title">🗺️ 地理位置</div>
+    <div style="width:100%;height:200px;background:#f0e8d0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-muted);font-family:'Noto Sans TC',sans-serif">（此處可嵌入 Google 地圖）</div>
+  </div>
+</div>
+
+<!-- ══ 管理儀表板（密碼保護）══ -->
+<div class="page" id="page-dashboard">
+  <div class="section-title" style="margin-top:1.25rem">報名統計儀表板</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-num">147</div><div class="stat-label">總報名人數</div></div>
+    <div class="stat-card"><div class="stat-num">128</div><div class="stat-label">已確認人數</div></div>
+    <div class="stat-card"><div class="stat-num">19</div><div class="stat-label">待審核人數</div></div>
+    <div class="stat-card"><div class="stat-num" style="font-size:22px">$96,600</div><div class="stat-label">已收款金額</div></div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-title">📊 活動報名分布</div>
+    <div class="bar-row"><div class="bar-label">進香報名</div><div class="bar-track"><div class="bar-fill red" id="b1" data-w="68%">68 人</div></div></div>
+    <div class="bar-row"><div class="bar-label">十二元神燈</div><div class="bar-track"><div class="bar-fill gold" id="b2" data-w="79%">79 盞</div></div></div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-title">💳 付款方式分布</div>
+    <div class="bar-row"><div class="bar-label">ATM 轉帳</div><div class="bar-track"><div class="bar-fill red" id="b3" data-w="52%">52%</div></div></div>
+    <div class="bar-row"><div class="bar-label">LINE Pay</div><div class="bar-track"><div class="bar-fill gold" id="b4" data-w="28%">28%</div></div></div>
+    <div class="bar-row"><div class="bar-label">街口支付</div><div class="bar-track"><div class="bar-fill red" id="b5" data-w="12%">12%</div></div></div>
+    <div class="bar-row"><div class="bar-label">現場繳費</div><div class="bar-track"><div class="bar-fill gold" id="b6" data-w="8%">8%</div></div></div>
+  </div>
+  <div class="chart-box">
+    <div class="chart-title">📋 最新報名記錄</div>
+    <div style="overflow-x:auto">
+      <table class="rec-table">
+        <tr><th>編號</th><th>活動</th><th>姓名</th><th>付款</th><th>狀態</th></tr>
+        <tr><td>TW-240601</td><td>進香</td><td>林○○</td><td>ATM</td><td><span class="badge wait">待審核</span></td></tr>
+        <tr><td>TW-240531</td><td>改厄燈×2</td><td>陳○○</td><td>LINE</td><td><span class="badge ok">已確認</span></td></tr>
+        <tr><td>TW-240530</td><td>進香</td><td>黃○○</td><td>街口</td><td><span class="badge ok">已確認</span></td></tr>
+        <tr><td>TW-240529</td><td>改厄燈×1</td><td>張○○</td><td>現場</td><td><span class="badge ok">已確認</span></td></tr>
+        <tr><td>TW-240528</td><td>進香</td><td>王○○</td><td>ATM</td><td><span class="badge rev">審核中</span></td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div>© 嘉義天巍宮 · 版權所有</div>
+  <div style="margin-top:4px">天巍宮數位報名系統 · 永久免費服務</div>
+  <br>
+  <button class="admin-entry" onclick="openAdminModal()">⚙ 管理員入口</button>
+</footer>
+
+<script>
+// ══ 請修改此處密碼 ══
+var ADMIN_PW = 'tianwei2026';
+var isAdmin = false;
+var act = '', pay = '', lamps = 1, companions = 0;
+var deityMap = {鼠:'武曲星君',牛:'天機星君',虎:'太陽星君',兔:'太陰星君',龍:'天同星君',蛇:'廉貞星君',馬:'天相星君',羊:'天梁星君',猴:'破軍星君',雞:'文昌星君',狗:'文曲星君',豬:'貪狼星君'};
+
+function switchPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  var t = document.getElementById('tab-' + id);
+  if (t) t.classList.add('active');
+  if (id === 'dashboard') {
+    setTimeout(function() {
+      document.querySelectorAll('.bar-fill').forEach(function(b) {
+        b.style.width = b.getAttribute('data-w');
+      });
+    }, 150);
+  }
+}
+
+// ── 管理員 ──
+function openAdminModal() {
+  document.getElementById('admin-modal').classList.add('show');
+  document.getElementById('admin-pw').value = '';
+  document.getElementById('pw-err').style.display = 'none';
+  setTimeout(function(){ document.getElementById('admin-pw').focus(); }, 150);
+}
+function closeModal() {
+  document.getElementById('admin-modal').classList.remove('show');
+}
+function checkPw() {
+  var pw = document.getElementById('admin-pw').value;
+  if (pw === ADMIN_PW) {
+    isAdmin = true;
+    closeModal();
+    document.getElementById('admin-bar').style.display = 'block';
+    if (!document.getElementById('tab-dashboard')) {
+      var btn = document.createElement('button');
+      btn.className = 'nav-btn';
+      btn.id = 'tab-dashboard';
+      btn.textContent = '📊 儀表板';
+      btn.onclick = function(){ switchPage('dashboard'); };
+      document.getElementById('public-nav').appendChild(btn);
+    }
+    switchPage('dashboard');
+  } else {
+    document.getElementById('pw-err').style.display = 'block';
+    document.getElementById('admin-pw').value = '';
+    document.getElementById('admin-pw').focus();
+  }
+}
+function adminLogout() {
+  isAdmin = false;
+  document.getElementById('admin-bar').style.display = 'none';
+  var t = document.getElementById('tab-dashboard');
+  if (t) t.remove();
+  switchPage('register');
+}
+document.getElementById('admin-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ── 報名流程 ──
+function selAct(id) {
+  act = id;
+  document.querySelectorAll('.act-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('act-' + id).classList.add('selected');
+}
+function goStep(n) {
+  if (n === 2 && !act) { alert('請先選擇活動項目'); return; }
+  if (n === 3) {
+    var name = act==='jx' ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+    var phone = act==='jx' ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+    if (!name.trim()) { alert('請填寫報名人姓名'); return; }
+    if (!phone.trim()) { alert('請填寫聯絡電話'); return; }
+  }
+  if (n === 4) {
+    if (!pay) { alert('請選擇付款方式'); return; }
+    buildSummary();
+  }
+  document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('success-screen').classList.remove('show');
+  document.getElementById('sf' + n).classList.add('active');
+  for (var i = 1; i <= 4; i++) {
+    var d = document.getElementById('sd' + i);
+    if (i < n) { d.className='step-dot done'; d.innerHTML='✓'; }
+    else if (i === n) { d.className='step-dot active'; d.textContent=i; }
+    else { d.className='step-dot'; d.textContent=i; }
+    if (i < 4) document.getElementById('sl'+i).className = i<n ? 'step-line done' : 'step-line';
+  }
+  if (n === 2) {
+    document.getElementById('form-jx').style.display = act==='jx' ? 'block' : 'none';
+    document.getElementById('form-dl').style.display = act==='dl' ? 'block' : 'none';
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function selPay(id) {
+  pay = id;
+  document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('pm-' + id).classList.add('selected');
+  document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('show'));
+  document.getElementById('pd-' + id).classList.add('show');
+}
+function buildSummary() {
+  var isJx = act==='jx';
+  var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+  var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+  var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+  var am = {jx:'進香報名',dl:'十二元神改厄燈'};
+  var qty = isJx ? (1+companions)+' 人' : lamps+' 盞';
+  var tot = isJx ? (1+companions)*2000 : lamps*600;
+  document.getElementById('sum-type').textContent = am[act];
+  document.getElementById('sum-name').textContent = name;
+  document.getElementById('sum-phone').textContent = phone;
+  document.getElementById('sum-pay').textContent = pm[pay];
+  document.getElementById('sum-qty').textContent = qty;
+  document.getElementById('sum-total-amt').textContent = '$' + tot.toLocaleString();
+}
+function submitForm() {
+  document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+  document.getElementById('steps-indicator').style.opacity = '0';
+  var no = 'TW-' + Date.now().toString().slice(-6);
+  document.getElementById('success-no').textContent = '編號：' + no;
+  document.getElementById('success-screen').classList.add('show');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function resetForm() {
+  act=''; pay=''; lamps=1; companions=0;
+  document.getElementById('steps-indicator').style.opacity='1';
+  document.getElementById('success-screen').classList.remove('show');
+  document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
+  document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
+  document.getElementById('companions-list').innerHTML='';
+  document.getElementById('lamp-n').textContent='1';
+  document.getElementById('lamp-amt').textContent='$600';
+  goStep(1);
+}
+
+// ── 工具函式 ──
+function autoDeity() {
+  var z = document.getElementById('dl-zodiac').value;
+  document.getElementById('dl-deity').value = z ? (deityMap[z]||'') : '';
+}
+function chgLamp(d) {
+  lamps = Math.max(1, Math.min(12, lamps+d));
+  document.getElementById('lamp-n').textContent = lamps;
+  document.getElementById('lamp-amt').textContent = '$'+(lamps*600).toLocaleString();
+}
+function togMS(btn){ btn.classList.toggle('sel'); }
+function addCompanion() {
+  companions++;
+  var div = document.createElement('div');
+  div.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px';
+  div.innerHTML='<div class="form-group"><label>姓名</label><input type="text" placeholder="同行人姓名"></div>'
+    +'<div class="form-group"><label>性別</label><select><option>男</option><option>女</option></select></div>'
+    +'<button onclick="this.parentElement.remove();companions--" style="height:38px;border:1px solid #ccc;border-radius:8px;background:white;cursor:pointer;padding:0 10px;font-size:14px;color:#999">✕</button>';
+  document.getElementById('companions-list').appendChild(div);
+}
+function queryStatus() {
+  var no=document.getElementById('q-no').value.trim();
+  var ph=document.getElementById('q-phone').value.trim();
+  if(!no||!ph){ alert('請輸入報名編號及電話後 4 碼'); return; }
+  document.getElementById('q-result').classList.add('show');
+}
+function showPrev(input, id) {
+  var file=input.files[0]; if(!file) return;
+  var r=new FileReader();
+  r.onload=function(e){
+    var box=document.getElementById(id);
+    document.getElementById(id+'-img').src=e.target.result;
+    box.style.display='block';
+  };
+  r.readAsDataURL(file);
+}
+</script>
+</body>
+</html>
