@@ -445,7 +445,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     <div class="info-notice">✅ 送出後系統將產生<strong>專屬報名編號</strong>，請記下以便查詢進度。<br>工作人員確認付款後，將以電話通知報名確認結果。</div>
     <div class="btn-row">
       <button class="btn-secondary" onclick="goStep(3)">← 返回</button>
-      <button class="btn-primary" style="flex:2" onclick="submitForm()">🙏 確認送出報名</button>
+      <button class="btn-primary" style="flex:2" id="submitBtn" onclick="submitForm()">🙏 確認送出報名</button>
     </div>
   </div>
 
@@ -815,5 +815,58 @@ function showPrev(input, id) {
     activeTimersNative.push(setInterval(update, 1000));
   }
 </script>
+  // ====== 這是連接 Google 試算表的新增程式碼 ======
+function submitForm() {
+  // 1. 抓取信眾在網頁上填寫的資料 (請確認 input 的 id 是否正確)
+  var formData = {
+    name: document.getElementById('dl-name') ? document.getElementById('dl-name').value : '',
+    phone: document.getElementById('dl-phone') ? document.getElementById('dl-phone').value : '',
+    address: document.getElementById('dl-address') ? document.getElementById('dl-address').value : '',
+    birthday: document.getElementById('dl-lunar-birth') ? document.getElementById('dl-lunar-birth').value : '',
+    plan: document.getElementById('dl-duration') ? document.getElementById('dl-duration').value : '祈福一年 ($600)'
+  };
+
+  // 簡單的必填檢查
+  if(!formData.name || !formData.phone || !formData.address) {
+    alert("請確認「姓名」、「電話」與「住址」皆已填寫！");
+    return;
+  }
+
+  // 2. 顯示載入中，避免重複點擊
+  const btn = document.getElementById('submitBtn');
+  const originalText = btn.innerText;
+  btn.innerText = "資料傳送中，請稍候...";
+  btn.disabled = true;
+
+  // 3. 您剛剛部署的 Google Apps Script 專屬網址
+  var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
+
+  // 4. 把資料發送到您的試算表
+  fetch(scriptUrl, {
+    method: 'POST',
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.status === "success") {
+      alert("✅ 報名資料已成功送出！請依指示進行匯款，廟方確認後即可使用查詢系統。");
+      
+      // 成功後可以跳轉到最後一個步驟（成功畫面），如果您原本有切換畫面的函數可以寫在這
+      // 例如：goStep(4); 或顯示 success-screen
+      
+    } else {
+      alert("❌ 發生錯誤：" + data.message);
+    }
+  })
+  .catch(error => {
+    alert("⚠️ 網路連線異常，請稍後再試。");
+  })
+  .finally(() => {
+    // 恢復按鈕狀態
+    btn.innerText = originalText;
+    btn.disabled = false;
+  });
+}
+// =================================================
 </body>
 </html>
