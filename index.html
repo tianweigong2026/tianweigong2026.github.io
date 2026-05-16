@@ -676,12 +676,63 @@ function buildSummary() {
   document.getElementById('sum-total-amt').textContent = '$' + tot.toLocaleString();
 }
 function submitForm() {
-  document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
-  document.getElementById('steps-indicator').style.opacity = '0';
-  var no = 'TW-' + Date.now().toString().slice(-6);
-  document.getElementById('success-no').textContent = '編號：' + no;
-  document.getElementById('success-screen').classList.add('show');
-  window.scrollTo({top:0,behavior:'smooth'});
+  // 1. 判斷信眾目前是報名「進香」還是「點燈」，並抓取對應資料
+  var isJx = (act === 'jx');
+  var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+  
+  var formData = {
+    name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
+    phone: isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value,
+    address: isJx ? document.getElementById('jx-addr').value : '無', 
+    birthday: isJx ? '' : '出生年: ' + document.getElementById('dl-year').value + ' 生肖: ' + document.getElementById('dl-zodiac').value,
+    plan: isJx ? '進香報名' : '十二元神改厄燈',
+    payment: pm[pay] || '未選擇'
+  };
+
+  // 2. 簡單防呆檢查：姓名跟電話一定要填
+  if(!formData.name || !formData.phone) {
+    alert("請確認「姓名」與「電話」皆已填寫完整！");
+    return;
+  }
+
+  // 3. 顯示按鈕傳送中動畫，防止信眾重複點擊
+  var btn = document.getElementById('submitBtn');
+  var originalText = btn.innerText;
+  btn.innerText = "資料傳送中，請稍候...";
+  btn.disabled = true;
+
+  // 4. 這裡已經替換成您剛剛部署的最新 Google Apps Script 網址
+  var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
+
+  // 5. 將打包好的資料發送到您的 Google 試算表
+  fetch(scriptUrl, {
+    method: 'POST',
+    body: JSON.stringify(formData)
+  })
+  .then(response => response.json())
+  .then(data => {
+    if(data.status === "success") {
+      // ✅ 傳送成功：隱藏表單，顯示原本超美的成功畫面！
+      document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+      document.getElementById('steps-indicator').style.opacity = '0';
+      
+      var no = 'TW-' + Date.now().toString().slice(-6);
+      document.getElementById('success-no').textContent = '編號：' + no;
+      document.getElementById('success-screen').classList.add('show');
+      window.scrollTo({top:0,behavior:'smooth'});
+    } else {
+      alert("❌ 發生錯誤：" + data.message);
+    }
+  })
+  .catch(error => {
+    alert("⚠️ 網路連線異常，請稍後再試。");
+  })
+  .finally(() => {
+    // 恢復按鈕狀態
+    btn.innerText = originalText;
+    btn.disabled = false;
+  });
+}
 }
 function resetForm() {
   act=''; pay=''; lamps=1; companions=0;
