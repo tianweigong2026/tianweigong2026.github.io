@@ -75,21 +75,13 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 .form-group textarea{min-height:70px;resize:none;line-height:1.6}
 .req{color:var(--red-light)}
 
-/* MULTI SELECT */
-.ms-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.ms-btn{border:1px solid var(--border);border-radius:20px;padding:4px 11px;font-size:11px;cursor:pointer;background:white;color:var(--ink);transition:all 0.15s;font-family:'Noto Sans TC',sans-serif}
-.ms-btn:hover{border-color:var(--gold)}
-.ms-btn.sel{background:var(--red);border-color:var(--red);color:white}
-
 /* PAYMENT */
 .pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
 .pay-card{border:1.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;background:white;text-align:center}
-.pay-detail{background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
 .pay-card.selected{border-color:var(--gold);background:#fffde8;box-shadow:0 0 0 3px rgba(201,150,12,0.2)}
 .pay-icon{font-size:22px;margin-bottom:5px}
 .pay-name{font-size:12px;font-weight:700;color:var(--ink)}
 .pay-desc{font-size:10px;color:var(--ink-muted);margin-top:2px;font-family:'Noto Sans TC',sans-serif}
-/* 🛠️ 已修正：將原本錯誤的小括號 ( 改回正確的大括號 { */
 .pay-detail {background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
 .pay-detail.show{display:block}
 .pay-detail-title{font-size:12px;color:var(--gold-dark);font-weight:700;margin-bottom:8px;font-family:'Noto Sans TC',sans-serif}
@@ -189,7 +181,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     <div class="modal-sub">請輸入管理員密碼</div>
     <input type="password" class="modal-input" id="admin-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkPw()">
     <div class="modal-err" id="pw-err">❌ 密碼錯誤，請再試一次</div>
-    <button class="modal-btn" onclick="checkPw()">進入管理介面</button>
+    <div class="modal-btn" onclick="checkPw()">進入管理介面</div>
     <button class="modal-cancel" onclick="closeModal()">取消</button>
   </div>
 </div>
@@ -276,14 +268,16 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
         <div class="form-row full">
           <div class="form-group">
             <label>交通方式 <span class="req">*</span></label>
-            <select id="jx-bus"><option value="搭乘大巴">搭乘大巴</option><option value="自行前往">自行前往</option></select>
+            <select id="jx-bus" onchange="toggleIdField()">
+              <option value="跟著坐遊覽車">跟著坐遊覽車</option>
+              <option value="自行前往">自行前往</option>
+            </select>
           </div>
         </div>
-        <div class="form-group" style="margin-top:5px">
-          <label>報名類別 (可複選)</label>
-          <div class="ms-row">
-            <button class="ms-btn" onclick="togMS(this)">隨香</button>
-            <button class="ms-btn" onclick="togMS(this)">號旗</button>
+        <div class="form-row full" id="id-card-group">
+          <div class="form-group">
+            <label>身分證字號 <span class="req">*</span> (申請遊覽車保險使用)</label>
+            <input type="text" id="jx-idcard" placeholder="請輸入身分證字號">
           </div>
         </div>
       </div>
@@ -419,7 +413,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
 
 <footer>
   <div>© 2026 嘉義天巍宮 版權所有</div>
-  <button class="admin-entry" onclick="openAdminModal()">🔐 管理員登入</button>
+  <div class="admin-entry" onclick="openAdminModal()">🔐 管理員登入</div>
 </footer>
 
 <script>
@@ -444,6 +438,18 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('act-' + id).classList.add('selected');
   }
 
+  // 控制身分證欄位的隱藏與顯示
+  function toggleIdField() {
+    var bus = document.getElementById('jx-bus').value;
+    var idGroup = document.getElementById('id-card-group');
+    if (bus === '跟著坐遊覽車') {
+      idGroup.style.display = 'block';
+    } else {
+      idGroup.style.display = 'none';
+      document.getElementById('jx-idcard').value = '';
+    }
+  }
+
   function goStep(n) {
     if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
     
@@ -456,6 +462,13 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
         if (!name || !phone || !addr) { 
           alert('請填寫所有必填（*）欄位：包含姓名、手機與住址！'); 
           return; 
+        }
+        // 🚨 防呆攔截：若搭遊覽車卻沒填身分證字號，直接阻擋
+        var bus = document.getElementById('jx-bus').value;
+        var idcard = document.getElementById('jx-idcard').value.trim();
+        if (bus === '跟著坐遊覽車' && !idcard) {
+          alert('請填寫身分證字號以利辦理遊覽車保險！');
+          return;
         }
       } else {
         var name = document.getElementById('dl-name').value.trim();
@@ -521,14 +534,13 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var isJx = (act === 'jx');
     var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
 
-    var jxTypeVal = '';
-    if(isJx) {
-      document.querySelectorAll('#form-jx .ms-btn.sel').forEach(b => jxTypeVal += b.innerText + ' ');
-    }
-    
     var sizeEl = document.getElementById('jx-size');
     var foodEl = document.getElementById('jx-food');
     var busEl = document.getElementById('jx-bus');
+    var idcardEl = document.getElementById('jx-idcard');
+    
+    // 如果是搭大巴就抓取身分證字號，如果是自行前往就傳「無」
+    var idcardVal = (busEl && busEl.value === '跟著坐遊覽車') ? idcardEl.value.trim() : '無';
 
     var formData = {
       name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
@@ -539,7 +551,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       payment: pm[pay] || '未選擇',
       companions: isJx ? companions : 0,
       
-      jxType: jxTypeVal.trim() || '未選擇',
+      jxType: isJx ? idcardVal : '無', // 📌 精準對接：直接把身分證字號傳入試算表的第 I 欄！
       size: sizeEl ? sizeEl.value : '未選擇',
       food: foodEl ? foodEl.value : '未選擇',
       bus: busEl ? busEl.value : '未選擇'
@@ -550,7 +562,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
     // 📌 【位置一：報名送出網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbxRThKGqT5hV_p3pTkv1xDRWbGkhqycI3l1H3ks_NLm7HPR2BeDFmMWhhQshxq4UcdIOQ/exec";
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
@@ -582,12 +594,17 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('success-screen').className = 'success-screen';
     document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
     document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
-    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';    document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
+    document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
+    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
+    document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
     document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    
+    // 乾淨重置新增的欄位狀態
+    if(document.getElementById('jx-idcard')) document.getElementById('jx-idcard').value = '';
+    if(document.getElementById('id-card-group')) document.getElementById('id-card-group').style.display = 'block';
+    
     goStep(1);
   }
-
-  function togMS(btn){ btn.classList.toggle('sel'); }
 
   function addCompanion() {
     companions++;
@@ -628,7 +645,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     activeIntervalsNative.forEach(clearInterval);
 
     // 📌 【位置二：進度查詢網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var queryUrl = "https://script.google.com/macros/s/AKfycbxRThKGqT5hV_p3pTkv1xDRWbGkhqycI3l1H3ks_NLm7HPR2BeDFmMWhhQshxq4UcdIOQ/exec?phone=" + phone;
+    var queryUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec?phone=" + phone;
 
     fetch(queryUrl)
       .then(response => response.json())
