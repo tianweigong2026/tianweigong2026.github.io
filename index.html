@@ -445,7 +445,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     <div class="info-notice">✅ 送出後系統將產生<strong>專屬報名編號</strong>，請記下以便查詢進度。<br>工作人員確認付款後，將以電話通知報名確認結果。</div>
     <div class="btn-row">
       <button class="btn-secondary" onclick="goStep(3)">← 返回</button>
-      <button class="btn-primary" style="flex:2" id="submitBtn" onclick="submitForm()">🙏 確認送出報名</button>
+      <button class="btn-primary" style="flex:2" onclick="submitForm()">🙏 確認送出報名</button>
     </div>
   </div>
 
@@ -556,368 +556,187 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
 </footer>
 
 <script>
-// ══ 請修改此處密碼 ══
-var ADMIN_PW = 'tianwei2026';
-var isAdmin = false;
-var act = '', pay = '', lamps = 1, companions = 0;
-var deityMap = {鼠:'武曲星君',牛:'天機星君',虎:'太陽星君',兔:'太陰星君',龍:'天同星君',蛇:'廉貞星君',馬:'天相星君',羊:'天梁星君',猴:'破軍星君',雞:'文昌星君',狗:'文曲星君',豬:'貪狼星君'};
+  // ══ 變數設定 ══
+  var ADMIN_PW = 'tianwei2026';
+  var isAdmin = false;
+  var act = '', pay = '';
+  var lamps = 1, companions = 0;
+  var deityMap = {'鼠':'千手觀音','牛':'虛空藏菩薩','虎':'虛空藏菩薩','兔':'文殊菩薩','龍':'普賢菩薩','蛇':'普賢菩薩','馬':'大勢至菩薩','羊':'大日如來','猴':'大日如來','雞':'不動明王','狗':'阿彌陀佛','豬':'阿彌陀佛'};
 
-function switchPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  var t = document.getElementById('tab-' + id);
-  if (t) t.classList.add('active');
-  if (id === 'dashboard') {
-    setTimeout(function() {
-      document.querySelectorAll('.bar-fill').forEach(function(b) {
-        b.style.width = b.getAttribute('data-w');
-      });
-    }, 150);
+  // ── 頁面與步驟切換 ──
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    document.getElementById('tab-' + pageId).classList.add('active');
+    window.scrollTo(0,0);
   }
-}
 
-// ── 管理員 ──
-function openAdminModal() {
-  document.getElementById('admin-modal').classList.add('show');
-  document.getElementById('admin-pw').value = '';
-  document.getElementById('pw-err').style.display = 'none';
-  setTimeout(function(){ document.getElementById('admin-pw').focus(); }, 150);
-}
-function closeModal() {
-  document.getElementById('admin-modal').classList.remove('show');
-}
-function checkPw() {
-  var pw = document.getElementById('admin-pw').value;
-  if (pw === ADMIN_PW) {
-    isAdmin = true;
-    closeModal();
-    document.getElementById('admin-bar').style.display = 'block';
-    if (!document.getElementById('tab-dashboard')) {
-      var btn = document.createElement('button');
-      btn.className = 'nav-btn';
-      btn.id = 'tab-dashboard';
-      btn.textContent = '📊 儀表板';
-      btn.onclick = function(){ switchPage('dashboard'); };
-      document.getElementById('public-nav').appendChild(btn);
+  function selAct(id) {
+    act = id;
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('act-' + id).classList.add('selected');
+  }
+
+  function goStep(n) {
+    if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
+    if (n === 3) {
+      var isJx = (act === 'jx');
+      var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+      var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+      if (!name || !phone) { alert('請填寫姓名與聯絡電話！'); return; }
     }
-    switchPage('dashboard');
-  } else {
-    document.getElementById('pw-err').style.display = 'block';
-    document.getElementById('admin-pw').value = '';
-    document.getElementById('admin-pw').focus();
-  }
-}
-function adminLogout() {
-  isAdmin = false;
-  document.getElementById('admin-bar').style.display = 'none';
-  var t = document.getElementById('tab-dashboard');
-  if (t) t.remove();
-  switchPage('register');
-}
-document.getElementById('admin-modal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+    if (n === 4 && !pay) { alert('請選擇付款方式！'); return; }
+    if (n === 4) { buildSummary(); }
 
-// ── 報名流程 ──
-function selAct(id) {
-  act = id;
-  document.querySelectorAll('.act-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('act-' + id).classList.add('selected');
-}
-function goStep(n) {
-  if (n === 2 && !act) { alert('請先選擇活動項目'); return; }
-  if (n === 3) {
-    var name = act==='jx' ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
-    var phone = act==='jx' ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
-    if (!name.trim()) { alert('請填寫報名人姓名'); return; }
-    if (!phone.trim()) { alert('請填寫聯絡電話'); return; }
-  }
-  if (n === 4) {
-    if (!pay) { alert('請選擇付款方式'); return; }
-    buildSummary();
-  }
-  document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
-  document.getElementById('success-screen').classList.remove('show');
-  document.getElementById('sf' + n).classList.add('active');
-  for (var i = 1; i <= 4; i++) {
-    var d = document.getElementById('sd' + i);
-    if (i < n) { d.className='step-dot done'; d.innerHTML='✓'; }
-    else if (i === n) { d.className='step-dot active'; d.textContent=i; }
-    else { d.className='step-dot'; d.textContent=i; }
-    if (i < 4) document.getElementById('sl'+i).className = i<n ? 'step-line done' : 'step-line';
-  }
-  if (n === 2) {
-    document.getElementById('form-jx').style.display = act==='jx' ? 'block' : 'none';
-    document.getElementById('form-dl').style.display = act==='dl' ? 'block' : 'none';
-  }
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-function selPay(id) {
-  pay = id;
-  document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('pm-' + id).classList.add('selected');
-  document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('show'));
-  document.getElementById('pd-' + id).classList.add('show');
-}
-function buildSummary() {
-  var isJx = act==='jx';
-  var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
-  var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
-  var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
-  var am = {jx:'進香報名',dl:'十二元神改厄燈'};
-  var qty = isJx ? (1+companions)+' 人' : lamps+' 盞';
-  var tot = isJx ? (1+companions)*2000 : lamps*600;
-  document.getElementById('sum-type').textContent = am[act];
-  document.getElementById('sum-name').textContent = name;
-  document.getElementById('sum-phone').textContent = phone;
-  document.getElementById('sum-pay').textContent = pm[pay];
-  document.getElementById('sum-qty').textContent = qty;
-  document.getElementById('sum-total-amt').textContent = '$' + tot.toLocaleString();
-}
-function submitForm() {
-  // 1. 判斷信眾目前是報名「進香」還是「點燈」，並抓取對應資料
-  var isJx = (act === 'jx');
-  var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
-  
-  var formData = {
-    name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
-    phone: isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value,
-    address: isJx ? document.getElementById('jx-addr').value : '無', 
-    birthday: isJx ? '' : '出生年: ' + document.getElementById('dl-year').value + ' 生肖: ' + document.getElementById('dl-zodiac').value,
-    plan: isJx ? '進香報名' : '十二元神改厄燈',
-    payment: pm[pay] || '未選擇'
-  };
+    document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('sf' + n).classList.add('active');
 
-  // 2. 簡單防呆檢查：姓名跟電話一定要填
-  if(!formData.name || !formData.phone) {
-    alert("請確認「姓名」與「電話」皆已填寫完整！");
-    return;
-  }
-
-  // 3. 顯示按鈕傳送中動畫，防止信眾重複點擊
-  var btn = document.getElementById('submitBtn');
-  var originalText = btn.innerText;
-  btn.innerText = "資料傳送中，請稍候...";
-  btn.disabled = true;
-
-  // 4. 這裡已經替換成您剛剛部署的最新 Google Apps Script 網址
-  var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
-
-  // 5. 將打包好的資料發送到您的 Google 試算表
-  fetch(scriptUrl, {
-    method: 'POST',
-    body: JSON.stringify(formData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if(data.status === "success") {
-      // ✅ 傳送成功：隱藏表單，顯示原本超美的成功畫面！
-      document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
-      document.getElementById('steps-indicator').style.opacity = '0';
-      
-      var no = 'TW-' + Date.now().toString().slice(-6);
-      document.getElementById('success-no').textContent = '編號：' + no;
-      document.getElementById('success-screen').classList.add('show');
-      window.scrollTo({top:0,behavior:'smooth'});
-    } else {
-      alert("❌ 發生錯誤：" + data.message);
+    for (var i = 1; i <= 4; i++) {
+      var d = document.getElementById('sd' + i);
+      if (i < n) { d.className='step-dot done'; d.innerHTML='✓'; }
+      else if (i === n) { d.className='step-dot active'; d.textContent=i; }
+      else { d.className='step-dot'; d.textContent=i; }
+      if (i < 4) document.getElementById('sl'+i).className = i<n ? 'step-line done' : 'step-line';
     }
-  })
-  .catch(error => {
-    alert("⚠️ 網路連線異常，請稍後再試。");
-  })
-  .finally(() => {
-    // 恢復按鈕狀態
-    btn.innerText = originalText;
-    btn.disabled = false;
-  });
-}
-}
-function resetForm() {
-  act=''; pay=''; lamps=1; companions=0;
-  document.getElementById('steps-indicator').style.opacity='1';
-  document.getElementById('success-screen').classList.remove('show');
-  document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
-  document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
-  document.getElementById('companions-list').innerHTML='';
-  document.getElementById('lamp-n').textContent='1';
-  document.getElementById('lamp-amt').textContent='$600';
-  goStep(1);
-}
 
-// ── 工具函式 ──
-function autoDeity() {
-  var z = document.getElementById('dl-zodiac').value;
-  document.getElementById('dl-deity').value = z ? (deityMap[z]||'') : '';
-}
-function chgLamp(d) {
-  lamps = Math.max(1, Math.min(12, lamps+d));
-  document.getElementById('lamp-n').textContent = lamps;
-  document.getElementById('lamp-amt').textContent = '$'+(lamps*600).toLocaleString();
-}
-function togMS(btn){ btn.classList.toggle('sel'); }
-function addCompanion() {
-  companions++;
-  var div = document.createElement('div');
-  div.style.cssText='display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin-bottom:8px';
-  div.innerHTML='<div class="form-group"><label>姓名</label><input type="text" placeholder="同行人姓名"></div>'
-    +'<div class="form-group"><label>性別</label><select><option>男</option><option>女</option></select></div>'
-    +'<button onclick="this.parentElement.remove();companions--" style="height:38px;border:1px solid #ccc;border-radius:8px;background:white;cursor:pointer;padding:0 10px;font-size:14px;color:#999">✕</button>';
-  document.getElementById('companions-list').appendChild(div);
-}
-function queryStatus() {
-  var no=document.getElementById('q-no').value.trim();
-  var ph=document.getElementById('q-phone').value.trim();
-  if(!no||!ph){ alert('請輸入報名編號及電話後 4 碼'); return; }
-  document.getElementById('q-result').classList.add('show');
-}
-function showPrev(input, id) {
-  var file=input.files[0]; if(!file) return;
-  var r=new FileReader();
-  r.onload=function(e){
-    var box=document.getElementById(id);
-    document.getElementById(id+'-img').src=e.target.result;
-    box.style.display='block';
-  };
-  r.readAsDataURL(file);
-}
-</script>
-  <script>
-  let activeTimersNative = [];
-
-  // 動態變色標籤邏輯
-  function updateBadgeColor(elementId, statusText) {
-    const el = document.getElementById(elementId);
-    el.innerText = statusText;
-    
-    // 待付款或未完成給紅色，其餘給綠色
-    if (statusText.includes("待付款") || statusText.includes("尚未") || statusText.includes("未完成")) {
-      el.className = "badge";
-      el.style.backgroundColor = "var(--red)";
-      el.style.color = "white";
-    } else if (statusText.includes("報名") || statusText.includes("成功") || statusText.includes("完成") || statusText.includes("確認")) {
-      el.className = "badge";
-      el.style.backgroundColor = "#2e7d32";
-      el.style.color = "white";
-    } else {
-      el.className = "badge";
-      el.style.backgroundColor = "var(--red)";
-      el.style.color = "white";
+    if (n === 2) {
+      document.getElementById('form-jx').style.display = act==='jx' ? 'block' : 'none';
+      document.getElementById('form-dl').style.display = act==='dl' ? 'block' : 'none';
     }
+    window.scrollTo({top:0, behavior:'smooth'});
   }
 
-  // 發送查詢請求給 Apps Script
-  function doNativeQuery() {
-    const phone = document.getElementById('queryPhoneInput').value.trim();
-    if (!phone) { alert("請輸入電話號碼"); return; }
-    
-    document.getElementById('queryLoading').style.display = 'block';
-    document.getElementById('queryResContainer').style.display = 'none';
-    document.getElementById('queryBtn').disabled = true;
-    activeTimersNative.forEach(clearInterval);
-
-    // 👇 這裡就是填入您專屬網址的地方，我已經幫您換好了！ 👇
-    const scriptUrl = "https://script.google.com/macros/s/AKfycbxsW6MmxnLiSBXPcU3LalOYhNvI269riwsBbf61fYZJyQy23SSVZUtJP7gcdbbMFuImDg/exec";
-    
-    // 透過 fetch 直接取得 JSON 資料
-    fetch(scriptUrl + "?action=queryPhone&phone=" + phone)
-      .then(res => res.json())
-      .then(res => {
-        document.getElementById('queryLoading').style.display = 'none';
-        document.getElementById('queryBtn').disabled = false;
-        
-        if (res && res.found) {
-          document.getElementById('queryResContainer').style.display = 'block';
-          document.getElementById('queryResName').innerText = "信士/信女：" + res.name;
-          
-          if(res.light) {
-            document.getElementById('queryLightBox').style.display = 'block';
-            updateBadgeColor('lightBadgeNative', res.light.status);
-            document.getElementById('lightDateNative').innerText = res.light.startStr + " ~ " + res.light.endStr;
-            startNativeTimer(res.light.deadline, 'countdownNative');
-          } else { document.getElementById('queryLightBox').style.display = 'none'; }
-
-          if(res.pilgrimage) {
-            document.getElementById('queryPilBox').style.display = 'block';
-            updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
-          } else { document.getElementById('queryPilBox').style.display = 'none'; }
-        } else {
-          alert("查無資料，請確認號碼是否正確");
-        }
-      })
-      .catch(err => {
-        document.getElementById('queryLoading').style.display = 'none';
-        document.getElementById('queryBtn').disabled = false;
-        alert("連線失敗：" + err.message);
-      });
+  function selPay(id) {
+    pay = id;
+    document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('pm-' + id).classList.add('selected');
+    document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('show'));
+    document.getElementById('pd-' + id).classList.add('show');
   }
 
-  // 倒數計時器
-  function startNativeTimer(deadline, elementId) {
-    function update() {
-      const diff = deadline - new Date().getTime();
-      if (diff <= 0) { document.getElementById(elementId).innerText = "已到期"; return; }
-      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
-      document.getElementById(elementId).innerText = d+"天 "+h+"時 "+m+"分 "+s+"秒";
-    }
-    update();
-    activeTimersNative.push(setInterval(update, 1000));
+  function buildSummary() {
+    var isJx = (act === 'jx');
+    var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+    var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+    var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+    var am = {jx:'進香報名',dl:'十二元神改厄燈'};
+    var qty = isJx ? (1+companions)+' 人' : lamps+' 盞';
+    var tot = isJx ? (1+companions)*2000 : lamps*600;
+
+    document.getElementById('sum-type').textContent = am[act];
+    document.getElementById('sum-name').textContent = name;
+    document.getElementById('sum-phone').textContent = phone;
+    document.getElementById('sum-pay').textContent = pm[pay];
+    document.getElementById('sum-qty').textContent = qty;
+    document.getElementById('sum-total-amt').textContent = '$' + tot.toLocaleString();
+  }
+
+  // ── 正式寫入 Google 試算表 ──
+  function submitForm() {
+    var isJx = (act === 'jx');
+    var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+
+    var formData = {
+      name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
+      phone: isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value,
+      address: isJx ? document.getElementById('jx-addr').value : '無',
+      birthday: isJx ? '' : '出生年: ' + document.getElementById('dl-year').value + ' 生肖: ' + document.getElementById('dl-zodiac').value,
+      plan: isJx ? '進香報名' : '十二元神改厄燈',
+      payment: pm[pay] || '未選擇'
+    };
+
+    var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)') || document.getElementById('submitBtn');
+    var originalText = btn ? btn.innerText : '🙏 確認送出報名';
+    if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
+
+    // 這是您專屬的接收資料網址
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
+
+    fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.status === "success") {
+        document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+        document.getElementById('steps-indicator').style.opacity = '0';
+        var no = 'TW-' + Date.now().toString().slice(-6);
+        document.getElementById('success-no').textContent = '編號：' + no;
+        document.getElementById('success-screen').classList.add('show');
+        window.scrollTo({top:0, behavior:'smooth'});
+      } else {
+        alert("❌ 發生錯誤：" + data.message);
+      }
+    })
+    .catch(error => {
+      alert("⚠️ 連線異常，請稍後再試。");
+    })
+    .finally(() => {
+      if(btn) { btn.innerText = originalText; btn.disabled = false; }
+    });
+  }
+
+  // ── 其他功能（重置、同行人員、點燈邏輯） ──
+  function resetForm() {
+    act=''; pay=''; lamps=1; companions=0;
+    document.getElementById('steps-indicator').style.opacity='1';
+    document.getElementById('success-screen').classList.remove('show');
+    document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
+    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
+    if(document.getElementById('lamp-n')) document.getElementById('lamp-n').textContent='1';
+    if(document.getElementById('lamp-amt')) document.getElementById('lamp-amt').textContent='$600';
+    document.querySelectorAll('input[type="text"], input[type="tel"], input[type="number"], textarea').forEach(i => i.value = '');
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    if(document.getElementById('dl-deity')) document.getElementById('dl-deity').value = '';
+    goStep(1);
+  }
+
+  function autoDeity() {
+    var z = document.getElementById('dl-zodiac').value;
+    document.getElementById('dl-deity').value = z ? (deityMap[z]||'') : '';
+  }
+
+  function chgLamp(d) {
+    lamps = Math.max(1, Math.min(12, lamps+d));
+    document.getElementById('lamp-n').textContent = lamps;
+    document.getElementById('lamp-amt').textContent = '$'+(lamps*600).toLocaleString();
+  }
+
+  function togMS(btn){ btn.classList.toggle('sel'); }
+
+  function addCompanion() {
+    companions++;
+    var div = document.createElement('div');
+    div.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;padding:10px;background:#fff9f0;border-radius:8px;border:1px solid #e0d0b0;position:relative;';
+    div.innerHTML = `
+      <div class="form-group"><label>姓名</label><input type="text" placeholder="親友姓名"></div>
+      <div class="form-group"><label>電話</label><input type="text" placeholder="聯絡方式"></div>
+      <button onclick="remCompanion(this)" style="position:absolute;top:-8px;right:-8px;background:white;border:1px solid #c0392b;color:#c0392b;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:bold;">×</button>
+    `;
+    document.getElementById('companions-list').appendChild(div);
+  }
+
+  function remCompanion(btn) {
+    btn.parentElement.remove();
+    companions = Math.max(0, companions-1);
+  }
+
+  // 管理員介面
+  function openAdminModal() { document.getElementById('admin-modal').classList.add('show'); }
+  function closeModal() { document.getElementById('admin-modal').classList.remove('show'); document.getElementById('pw-err').style.display='none'; }
+  function checkPw() {
+    if(document.getElementById('admin-pw').value === ADMIN_PW) {
+      isAdmin = true; closeModal(); document.getElementById('admin-bar').style.display = 'block'; alert('管理員登入成功！');
+    } else { document.getElementById('pw-err').style.display = 'block'; }
+  }
+  function adminLogout() {
+    isAdmin = false; document.getElementById('admin-bar').style.display = 'none'; document.getElementById('admin-pw').value = ''; alert('已登出');
   }
 </script>
-  // ====== 這是連接 Google 試算表的新增程式碼 ======
-function submitForm() {
-  // 1. 抓取信眾在網頁上填寫的資料 (請確認 input 的 id 是否正確)
-  var formData = {
-    name: document.getElementById('dl-name') ? document.getElementById('dl-name').value : '',
-    phone: document.getElementById('dl-phone') ? document.getElementById('dl-phone').value : '',
-    address: document.getElementById('dl-address') ? document.getElementById('dl-address').value : '',
-    birthday: document.getElementById('dl-lunar-birth') ? document.getElementById('dl-lunar-birth').value : '',
-    plan: document.getElementById('dl-duration') ? document.getElementById('dl-duration').value : '祈福一年 ($600)'
-  };
-
-  // 簡單的必填檢查
-  if(!formData.name || !formData.phone || !formData.address) {
-    alert("請確認「姓名」、「電話」與「住址」皆已填寫！");
-    return;
-  }
-
-  // 2. 顯示載入中，避免重複點擊
-  const btn = document.getElementById('submitBtn');
-  const originalText = btn.innerText;
-  btn.innerText = "資料傳送中，請稍候...";
-  btn.disabled = true;
-
-  // 3. 您剛剛部署的 Google Apps Script 專屬網址
-  var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
-
-  // 4. 把資料發送到您的試算表
-  fetch(scriptUrl, {
-    method: 'POST',
-    body: JSON.stringify(formData)
-  })
-  .then(response => response.json())
-  .then(data => {
-    if(data.status === "success") {
-      alert("✅ 報名資料已成功送出！請依指示進行匯款，廟方確認後即可使用查詢系統。");
-      
-      // 成功後可以跳轉到最後一個步驟（成功畫面），如果您原本有切換畫面的函數可以寫在這
-      // 例如：goStep(4); 或顯示 success-screen
-      
-    } else {
-      alert("❌ 發生錯誤：" + data.message);
-    }
-  })
-  .catch(error => {
-    alert("⚠️ 網路連線異常，請稍後再試。");
-  })
-  .finally(() => {
-    // 恢復按鈕狀態
-    btn.innerText = originalText;
-    btn.disabled = false;
-  });
-}
-// =================================================
+</script>
 </body>
 </html>
