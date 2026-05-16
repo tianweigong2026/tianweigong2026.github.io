@@ -110,7 +110,6 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,26,26,0.35)}
 .btn-secondary{width:100%;padding:12px;border:1px solid var(--border);border-radius:10px;background:white;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:13px;color:var(--ink-muted)}
 .btn-secondary:hover{background:#fffde8}
-/* 讓上下兩步按鈕變成 50/50 平均大小 */
 .btn-row{display:flex;gap:10px;margin-top:15px}
 .btn-row button{flex:1;}
 
@@ -446,14 +445,33 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('act-' + id).classList.add('selected');
   }
 
+  // 修改此處：增加嚴格的必填欄位檢查
   function goStep(n) {
     if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
+    
+    // 檢查從 Step 2 前往 Step 3 的必填欄位
     if (n === 3) {
       var isJx = (act === 'jx');
-      var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
-      var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
-      if (!name || !phone) { alert('請填寫姓名與聯絡電話！'); return; }
+      if (isJx) {
+        var name = document.getElementById('jx-name').value.trim();
+        var phone = document.getElementById('jx-phone').value.trim();
+        var addr = document.getElementById('jx-addr').value.trim();
+        if (!name || !phone || !addr) { 
+          alert('請填寫所有必填（*）欄位：包含姓名、手機與住址！'); 
+          return; 
+        }
+      } else {
+        var name = document.getElementById('dl-name').value.trim();
+        var phone = document.getElementById('dl-phone').value.trim();
+        var addr = document.getElementById('dl-address').value.trim();
+        var birth = document.getElementById('dl-lunar-birth').value.trim();
+        if (!name || !phone || !addr || !birth) { 
+          alert('請填寫所有必填（*）欄位：包含住址與農曆生日！'); 
+          return; 
+        }
+      }
     }
+    
     if (n === 4 && !pay) { alert('請選擇付款方式！'); return; }
     if (n === 4) { buildSummary(); }
 
@@ -490,7 +508,6 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
     var am = {jx:'進香報名',dl:'十二元神改厄燈'};
     
-    // 計算總金額：進香每人1000，點燈每人1200
     var qty = isJx ? (1+companions)+' 人' : '1 人';
     var tot = isJx ? (1+companions)*1000 : 1200;
 
@@ -528,7 +545,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       jxType: jxTypeVal.trim() || '未選擇',
       size: sizeEl ? sizeEl.value : '未選擇',
       food: foodEl ? foodEl.value : '未選擇',
-      bus: busEl ? busEl.value : '未选择'
+      bus: busEl ? busEl.value : '未選擇'
     };
 
     var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)');
