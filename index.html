@@ -717,5 +717,87 @@ function showPrev(input, id) {
   r.readAsDataURL(file);
 }
 </script>
+  <script>
+  let activeTimersNative = [];
+
+  // 動態變色標籤邏輯
+  function updateBadgeColor(elementId, statusText) {
+    const el = document.getElementById(elementId);
+    el.innerText = statusText;
+    
+    // 待付款或未完成給紅色，其餘給綠色
+    if (statusText.includes("待付款") || statusText.includes("尚未") || statusText.includes("未完成")) {
+      el.className = "badge";
+      el.style.backgroundColor = "var(--red)";
+      el.style.color = "white";
+    } else if (statusText.includes("報名") || statusText.includes("成功") || statusText.includes("完成") || statusText.includes("確認")) {
+      el.className = "badge";
+      el.style.backgroundColor = "#2e7d32";
+      el.style.color = "white";
+    } else {
+      el.className = "badge";
+      el.style.backgroundColor = "var(--red)";
+      el.style.color = "white";
+    }
+  }
+
+  // 發送查詢請求給 Apps Script
+  function doNativeQuery() {
+    const phone = document.getElementById('queryPhoneInput').value.trim();
+    if (!phone) { alert("請輸入電話號碼"); return; }
+    
+    document.getElementById('queryLoading').style.display = 'block';
+    document.getElementById('queryResContainer').style.display = 'none';
+    document.getElementById('queryBtn').disabled = true;
+    activeTimersNative.forEach(clearInterval);
+
+    // 👇 這裡就是填入您專屬網址的地方，我已經幫您換好了！ 👇
+    const scriptUrl = "https://script.google.com/macros/s/AKfycbxsW6MmxnLiSBXPcU3LalOYhNvI269riwsBbf61fYZJyQy23SSVZUtJP7gcdbbMFuImDg/exec";
+    
+    // 透過 fetch 直接取得 JSON 資料
+    fetch(scriptUrl + "?action=queryPhone&phone=" + phone)
+      .then(res => res.json())
+      .then(res => {
+        document.getElementById('queryLoading').style.display = 'none';
+        document.getElementById('queryBtn').disabled = false;
+        
+        if (res && res.found) {
+          document.getElementById('queryResContainer').style.display = 'block';
+          document.getElementById('queryResName').innerText = "信士/信女：" + res.name;
+          
+          if(res.light) {
+            document.getElementById('queryLightBox').style.display = 'block';
+            updateBadgeColor('lightBadgeNative', res.light.status);
+            document.getElementById('lightDateNative').innerText = res.light.startStr + " ~ " + res.light.endStr;
+            startNativeTimer(res.light.deadline, 'countdownNative');
+          } else { document.getElementById('queryLightBox').style.display = 'none'; }
+
+          if(res.pilgrimage) {
+            document.getElementById('queryPilBox').style.display = 'block';
+            updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
+          } else { document.getElementById('queryPilBox').style.display = 'none'; }
+        } else {
+          alert("查無資料，請確認號碼是否正確");
+        }
+      })
+      .catch(err => {
+        document.getElementById('queryLoading').style.display = 'none';
+        document.getElementById('queryBtn').disabled = false;
+        alert("連線失敗：" + err.message);
+      });
+  }
+
+  // 倒數計時器
+  function startNativeTimer(deadline, elementId) {
+    function update() {
+      const diff = deadline - new Date().getTime();
+      if (diff <= 0) { document.getElementById(elementId).innerText = "已到期"; return; }
+      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+      document.getElementById(elementId).innerText = d+"天 "+h+"時 "+m+"分 "+s+"秒";
+    }
+    update();
+    activeTimersNative.push(setInterval(update, 1000));
+  }
+</script>
 </body>
 </html>
