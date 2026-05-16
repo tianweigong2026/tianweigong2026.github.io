@@ -132,4 +132,546 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 .step-form.active{display:block;animation:fadeIn 0.3s ease}
 
 /* QUERY NATIVE */
-.query-card { background: white; border-radius: 12px; box-
+.query-card { background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid var(--border); padding: 20px; margin-top: 15px; }
+.query-input-group { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; align-items: center; }
+.query-input { width: 100%; max-width: 350px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; outline: none; text-align: center; }
+.query-btn { width: 100%; max-width: 350px; padding: 12px; background: linear-gradient(135deg,#6b1212,#8B1A1A); color: #f5d76e; border: none; border-radius: 8px; cursor: pointer; font-size: 1.1rem; font-weight: bold; letter-spacing: 2px; }
+.query-res-box { background: #fff9c4; border-left: 5px solid #fbc02d; padding: 12px; text-align: left; margin-top: 15px; border-radius: 8px; }
+.query-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; color: white !important; font-size: 0.85rem; font-weight: bold; }
+.badge-success { background-color: #2e7d32 !important; }
+.badge-pending { background-color: #d32f2f !important; }
+.query-timer { font-size: 0.85rem; color: #555; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 4px; margin-top: 8px; border: 1px dashed #fbc02d; text-align: center; }
+#countdownNative { font-weight: bold; color: #d32f2f; font-family: monospace; font-size: 1rem; }
+
+/* ADMIN MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(30,10,10,0.8);z-index:999;display:none;align-items:center;justify-content:center}
+.modal-overlay.show{display:flex;animation:fadeIn 0.25s ease}
+.modal-box{background:white;border-radius:16px;padding:2rem 1.5rem;width:min(340px,90vw);text-align:center;position:relative;overflow:hidden}
+.modal-box::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--red),var(--gold))}
+.modal-icon{font-size:36px;margin-bottom:10px}
+.modal-title{font-size:16px;font-weight:700;color:var(--red);letter-spacing:3px;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--ink-muted);margin-bottom:1.25rem;font-family:'Noto Sans TC',sans-serif}
+.modal-input{width:100%;border:1.5px solid var(--border);border-radius:8px;padding:10px 12px;font-size:16px;text-align:center;letter-spacing:4px;font-family:'Noto Sans TC',sans-serif;margin-bottom:10px}
+.modal-input:focus{outline:none;border-color:var(--gold)}
+.modal-err{font-size:11px;color:var(--red-light);margin-bottom:10px;display:none;font-family:'Noto Sans TC',sans-serif}
+.modal-btn{width:100%;padding:12px;background:linear-gradient(135deg,#6b1212,#8B1A1A);border:none;border-radius:8px;color:#f5d76e;font-size:13px;font-weight:700;letter-spacing:2px;cursor:pointer;font-family:'Noto Serif TC',serif}
+.modal-cancel{background:none;border:none;font-size:11px;color:var(--ink-muted);cursor:pointer;margin-top:10px;font-family:'Noto Sans TC',sans-serif;display:block;width:100%;padding:6px}
+
+/* ADMIN BAR */
+.admin-bar-wrap{background:#2c1810;border-bottom:1px solid var(--gold);display:none}
+.admin-bar-inner{max-width:680px;margin:0 auto;padding:10px 1rem;display:flex;align-items:center;justify-content:space-between}
+.admin-bar-title{color:#f5d76e;font-size:12px;letter-spacing:2px;font-family:'Noto Sans TC',sans-serif;font-weight:600}
+.admin-logout{background:none;border:1px solid rgba(245,215,110,0.3);border-radius:6px;color:rgba(245,215,110,0.7);font-size:11px;padding:4px 10px;cursor:pointer;font-family:'Noto Sans TC',sans-serif}
+.admin-logout:hover{border-color:var(--gold);color:#f5d76e}
+
+/* INFO */
+.info-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem;margin-bottom:10px}
+.info-card-title{font-size:12px;color:var(--gold-dark);letter-spacing:2px;font-weight:700;margin-bottom:8px;font-family:'Noto Sans TC',sans-serif}
+.info-card p{font-size:12px;color:var(--ink);line-height:2.2;font-family:'Noto Sans TC',sans-serif}
+
+/* FOOTER */
+footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgba(245,215,110,0.35);font-size:10px;letter-spacing:2px;font-family:'Noto Sans TC',sans-serif}
+.admin-entry{background:none;border:none;color:rgba(245,215,110,0.18);font-size:10px;cursor:pointer;letter-spacing:1px;font-family:'Noto Sans TC',sans-serif;padding:8px 12px;margin-top:8px;transition:color 0.3s;display:inline-block}
+.admin-entry:hover{color:rgba(245,215,110,0.55)}
+
+@media(max-width:480px){
+  .act-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .logo-char{letter-spacing:4px}
+}
+</style>
+</head>
+<body>
+
+<div class="modal-overlay" id="admin-modal">
+  <div class="modal-box">
+    <div class="modal-icon">🔐</div>
+    <div class="modal-title">管理員登入</div>
+    <div class="modal-sub">請輸入管理員密碼</div>
+    <input type="password" class="modal-input" id="admin-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkPw()">
+    <div class="modal-err" id="pw-err">❌ 密碼錯誤，請再試一次</div>
+    <button class="modal-btn" onclick="checkPw()">進入管理介面</button>
+    <button class="modal-cancel" onclick="closeModal()">取消</button>
+  </div>
+</div>
+
+<header class="header">
+  <span class="logo-char">嘉義天巍宮</span>
+  <div class="logo-en">TIAN WEI GONG · CHIAYI</div>
+  <div class="gold-line"></div>
+  <div class="header-sub">數位報名系統</div>
+</header>
+
+<div class="admin-bar-wrap" id="admin-bar">
+  <div class="admin-bar-inner">
+    <span class="admin-bar-title">🔑 管理員模式</span>
+    <button class="admin-logout" onclick="adminLogout()">⬅ 登出</button>
+  </div>
+</div>
+
+<nav id="public-nav">
+  <button class="nav-btn active" onclick="switchPage('register')" id="tab-register">📋 活動報名</button>
+  <button class="nav-btn" onclick="switchPage('query')" id="tab-query">🔍 查詢進度</button>
+  <button class="nav-btn" onclick="switchPage('info')" id="tab-info">🏛️ 宮廟資訊</button>
+</nav>
+
+<div class="page active" id="page-register">
+  <div class="steps" id="steps-indicator" style="margin-top:1.25rem">
+    <div class="step-wrap"><div class="step-dot active" id="sd1">1</div><div class="step-label">選擇</div></div>
+    <div class="step-line" id="sl1"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd2">2</div><div class="step-label">填寫</div></div>
+    <div class="step-line" id="sl2"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd3">3</div><div class="step-label">付款</div></div>
+    <div class="step-line" id="sl3"></div>
+    <div class="step-wrap"><div class="step-dot" id="sd4">4</div><div class="step-label">確認</div></div>
+  </div>
+
+  <div class="step-form active" id="sf1">
+    <div class="section-title">選擇報名項目</div>
+    <div class="act-grid">
+      <div class="act-card" id="act-jx" onclick="selAct('jx')">
+        <div class="act-icon">🏮</div>
+        <div class="act-title">進香報名</div>
+        <div class="act-desc">隨駕進香活動<br>含交通、住宿安排</div>
+        <div class="act-price">$ 2,000 ／人</div>
+      </div>
+      <div class="act-card" id="act-dl" onclick="selAct('dl')">
+        <div class="act-icon">🕯️</div>
+        <div class="act-title">十二元神改厄燈</div>
+        <div class="act-desc">點燈祈福消災<br>安排元神燈期</div>
+        <div class="act-price">$ 600 ／盞</div>
+      </div>
+    </div>
+    <button class="btn-primary" onclick="goStep(2)">下一步 →</button>
+  </div>
+
+  <div class="step-form" id="sf2">
+    <div class="section-title">填寫報名資料</div>
+    
+    <div id="form-jx" style="display:none">
+      <div class="card">
+        <div class="fsec-title">🙏 報名人資料</div>
+        <div class="form-row">
+          <div class="form-group"><label>信士/信女姓名 <span class="req">*</span></label><input type="text" id="jx-name" placeholder="請填寫真實姓名"></div>
+          <div class="form-group"><label>聯絡電話 <span class="req">*</span></label><input type="tel" id="jx-phone" placeholder="手提電話號碼"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>居住住址 <span class="req">*</span></label><input type="text" id="jx-addr" placeholder="完整居住地址（代寫疏文用）"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fsec-title">👕 物資與行程登記</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>衣服尺寸 <span class="req">*</span></label>
+            <select id="jx-size">
+              <option value="S">S</option><option value="M">M</option><option value="L">L</option>
+              <option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>膳食習慣 <span class="req">*</span></label>
+            <select id="jx-food"><option value="葷食">葷食</option><option value="素食">素食</option></select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>交通方式 <span class="req">*</span></label>
+            <select id="jx-bus"><option value="搭乘大巴">搭乘大巴</option><option value="自行前往">自行前往</option></select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:5px">
+          <label>報名類別 (可複選)</label>
+          <div class="ms-row">
+            <button class="ms-btn" onclick="togMS(this)">隨香</button>
+            <button class="ms-btn" onclick="togMS(this)">號旗</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="fsec-title">👥 同行親友</div>
+        <div id="companions-list"></div>
+        <button class="btn-secondary" style="width:100%;margin-top:5px" onclick="addCompanion()">＋ 新增同行親友</button>
+      </div>
+    </div>
+
+    <div id="form-dl" style="display:none">
+      <div class="card">
+        <div class="fsec-title">🕯️ 點燈人資料</div>
+        <div class="form-row">
+          <div class="form-group"><label>信士/信女姓名 <span class="req">*</span></label><input type="text" id="dl-name" placeholder="請填寫真實姓名"></div>
+          <div class="form-group"><label>聯絡電話 <span class="req">*</span></label><input type="tel" id="dl-phone" placeholder="手提電話號碼"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>居住住址 <span class="req">*</span></label><input type="text" id="dl-address" placeholder="完整居住地址（代寫疏文用）"></div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group"><label>農曆生日 <span class="req">*</span></label><input type="text" id="dl-lunar-birth" placeholder="例如：70年8月15日 或 1981年8月15日"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)">← 上一步</button>
+      <button class="btn-primary" onclick="goStep(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <div class="step-form" id="sf3">
+    <div class="section-title">選擇付款方式</div>
+    <div class="pay-grid">
+      <div class="pay-card" id="pm-atm" onclick="selPay('atm')"><div class="pay-icon">🏦</div><div class="pay-name">ATM 轉帳</div></div>
+      <div class="pay-card" id="pm-line" onclick="selPay('line')"><div class="pay-icon">💬</div><div class="pay-name">LINE Pay</div></div>
+      <div class="pay-card" id="pm-street" onclick="selPay('street')"><div class="pay-icon">🏪</div><div class="pay-name">街口支付</div></div>
+      <div class="pay-card" id="pm-onsite" onclick="selPay('onsite')"><div class="pay-icon">⛩️</div><div class="pay-name">現場繳費</div></div>
+    </div>
+    
+    <div class="pay-detail" id="pd-atm">
+      <div class="pay-detail-title">🏦 銀行轉帳資訊</div>
+      <div class="bank-info">銀行代碼：<strong>006 合作金庫</strong><br>轉帳帳號：<strong>1234-567-890123</strong><br>戶名：<strong>天巍宮</strong></div>
+    </div>
+    <div class="pay-detail" id="pd-line">
+      <div class="pay-detail-title">💬 LINE Pay 線上支付</div>
+      <div class="bank-info" style="text-align:center">請於送出後掃描下方條碼或點擊連結付款</div>
+    </div>
+    <div class="pay-detail" id="pd-street">
+      <div class="pay-detail-title">🏪 街口支付</div>
+      <div class="bank-info" style="text-align:center">正對接街口宮廟專案，請靜候後續更新</div>
+    </div>
+    <div class="pay-detail" id="pd-onsite">
+      <div class="pay-detail-title">⛩️ 服務台現場繳費</div>
+      <div class="bank-info">登記完成後，請於開燈日（每月初一前當晚降駕）前至天巍宮服務台完成現金繳費。</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)">← 上一步</button>
+      <button class="btn-primary" onclick="goStep(4)">下一步 →</button>
+    </div>
+  </div>
+
+  <div class="step-form" id="sf4">
+    <div class="section-title">確認報名資料</div>
+    <div class="summary-box">
+      <div class="sum-row"><span class="sum-label">項目</span><span class="sum-val" id="sum-type">-</span></div>
+      <div class="sum-row"><span class="sum-label">姓名</span><span class="sum-val" id="sum-name">-</span></div>
+      <div class="sum-row"><span class="sum-label">電話</span><span class="sum-val" id="sum-phone">-</span></div>
+      <div class="sum-row"><span class="sum-label">付款方式</span><span class="sum-val" id="sum-pay">-</span></div>
+      <div class="sum-row"><span class="sum-label">數量</span><span class="sum-val" id="sum-qty">-</span></div>
+      <div class="sum-total"><span class="tl">總金額</span><span class="ta" id="sum-total-amt">$0</span></div>
+    </div>
+    <div class="info-notice"><strong>⚠️ 注意事項：</strong> 送出報名資料後，系統狀態將預設為「待付款」，待廟方管理員核對完款項後，即會改為「報名成功」，屆時您便能透過手機號碼即時查詢進度與燈期倒數。</div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(3)">← 上一步</button>
+      <button class="btn-primary" onclick="submitForm()">🙏 確認送出報名</button>
+    </div>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">🎉</div>
+    <div class="success-title">報名登記成功</div>
+    <div class="success-no" id="success-no">編號：TW-000000</div>
+    <div class="success-sub">感謝信士/信女的虔誠登記。<br>請記得完成匯款或現場繳費。<br>廟方核對後將立刻開展服務！</div>
+    <button class="btn-primary" style="margin-top:2rem;max-width:200px" onclick="resetForm()">返回報名首頁</button>
+  </div>
+</div>
+
+<div class="page" id="page-query">
+  <div class="section-title">進度與燈期查詢</div>
+  <div class="query-card">
+    <div class="query-input-group">
+      <input type="tel" id="queryPhoneInput" class="query-input" placeholder="請輸入報名時填寫的電話號碼">
+      <button id="queryBtn" class="query-btn" onclick="doNativeQuery()">立即查詢進度</button>
+    </div>
+    <div id="queryLoading" style="display:none; text-align:center; padding:10px; color:#d32f2f; font-weight:bold;">連線查詢中...</div>
+    
+    <div id="queryResContainer" style="display:none;">
+      <div id="queryResDisplayName" class="name-banner" style="background:#ffebee; color:#333; font-weight:bold; padding:10px; border-radius:5px; font-size:1.1rem; text-align:center; margin-bottom:10px;"></div>
+      
+      <div id="queryLightBox" class="query-res-box" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <span style="font-weight: bold; color: #d32f2f; font-size: 1.1rem;">十二元神點燈</span>
+          <span id="lightBadgeNative" class="query-badge"></span>
+        </div>
+        <div id="lightDateNativeArea" style="font-size: 0.9rem; margin-top: 10px; color:#333;"></div>
+        <div class="query-timer">距離截止剩餘：<br><span id="countdownNative"></span></div>
+      </div>
+
+      <div id="queryPilBox" class="query-res-box" style="display:none;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <span style="font-weight: bold; color: #d32f2f; font-size: 1.1rem;">隨駕進香報名</span>
+          <span id="pilBadgeNative" class="query-badge"></span>
+        </div>
+        <p style="font-size: 0.9rem; margin-top: 10px; color: #555;">您已完成登記，期待與您參與盛事。</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="page" id="page-info">
+  <div class="section-title">宮廟資訊</div>
+  <div class="info-card">
+    <div class="info-card-title">⛩️ 關於 嘉義天巍宮</div>
+    <p>天巍宮固定於<strong>每逢初一前一晚降駕</strong>點亮十二元神改厄燈，並固定於每月初一、十五誦經祈福、消災迴向，庇佑信眾元神光彩、消災解厄、事事順遂。</p>
+  </div>
+  <div class="info-card">
+    <div class="info-card-title">📍 宮廟地址與聯絡</div>
+    <p>宮址：嘉義市西區（詳細請洽管理員）<br>服務時間：每日 08:00 ~ 21:00</p>
+  </div>
+</div>
+
+<footer>
+  <div>© 2026 嘉義天巍宮 版權所有</div>
+  <button class="admin-entry" onclick="openAdminModal()">🔐 管理員登入</button>
+</footer>
+
+<script>
+  // ══ 變數設定 ══
+  var ADMIN_PW = 'tianwei2026';
+  var isAdmin = false;
+  var act = '', pay = '';
+  var companions = 0; // 移除 lamps 變數
+
+  // ── 頁面與步驟切換 ──
+  function switchPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    document.getElementById('tab-' + pageId).classList.add('active');
+    window.scrollTo(0,0);
+  }
+
+  function selAct(id) {
+    act = id;
+    document.querySelectorAll('.act-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('act-' + id).classList.add('selected');
+  }
+
+  function goStep(n) {
+    if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
+    if (n === 3) {
+      var isJx = (act === 'jx');
+      var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+      var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+      if (!name || !phone) { alert('請填寫姓名與聯絡電話！'); return; }
+    }
+    if (n === 4 && !pay) { alert('請選擇付款方式！'); return; }
+    if (n === 4) { buildSummary(); }
+
+    document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+    document.getElementById('sf' + n).classList.add('active');
+
+    for (var i = 1; i <= 4; i++) {
+      var d = document.getElementById('sd' + i);
+      if (i < n) { d.className='step-dot done'; d.innerHTML='✓'; }
+      else if (i === n) { d.className='step-dot active'; d.textContent=i; }
+      else { d.className='step-dot'; d.textContent=i; }
+      if (i < 4) document.getElementById('sl'+i).className = i<n ? 'step-line done' : 'step-line';
+    }
+
+    if (n === 2) {
+      document.getElementById('form-jx').style.display = act==='jx' ? 'block' : 'none';
+      document.getElementById('form-dl').style.display = act==='dl' ? 'block' : 'none';
+    }
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  function selPay(id) {
+    pay = id;
+    document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('pm-' + id).className = 'pay-card selected';
+    document.querySelectorAll('.pay-detail').forEach(d => d.classList.remove('show'));
+    document.getElementById('pd-' + id).className = 'pay-detail show';
+  }
+
+  function buildSummary() {
+    var isJx = (act === 'jx');
+    var name = isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value;
+    var phone = isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value;
+    var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+    var am = {jx:'進香報名',dl:'十二元神改厄燈'};
+    
+    // 移除點燈數量，統一顯示數量或人數
+    var qty = isJx ? (1+companions)+' 人' : '1 盞';
+    var tot = isJx ? (1+companions)*2000 : 600;
+
+    document.getElementById('sum-type').textContent = am[act];
+    document.getElementById('sum-name').textContent = name;
+    document.getElementById('sum-phone').textContent = phone;
+    document.getElementById('sum-pay').textContent = pm[pay];
+    document.getElementById('sum-qty').textContent = qty;
+    document.getElementById('sum-total-amt').textContent = '$' + tot.toLocaleString();
+  }
+
+  // ── 正式寫入 Google 試算表 ──
+  function submitForm() {
+    var isJx = (act === 'jx');
+    var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
+
+    var jxTypeVal = '';
+    if(isJx) {
+      document.querySelectorAll('#form-jx .ms-btn.sel').forEach(b => jxTypeVal += b.innerText + ' ');
+    }
+    
+    var sizeEl = document.getElementById('jx-size');
+    var foodEl = document.getElementById('jx-food');
+    var busEl = document.getElementById('jx-bus');
+
+    var formData = {
+      name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
+      phone: isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value,
+      address: isJx ? document.getElementById('jx-addr').value : document.getElementById('dl-address').value,
+      birthday: isJx ? '' : document.getElementById('dl-lunar-birth').value, // 抓取農曆生日
+      plan: isJx ? '進香報名' : '十二元神改厄燈',
+      payment: pm[pay] || '未選擇',
+      companions: isJx ? companions : 0,
+      
+      jxType: jxTypeVal.trim() || '未選擇',
+      size: sizeEl ? sizeEl.value : '未選擇',
+      food: foodEl ? foodEl.value : '未選擇',
+      bus: busEl ? busEl.value : '未選擇'
+    };
+
+    var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)');
+    var originalText = btn ? btn.innerText : '🙏 確認送出報名';
+    if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
+
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
+
+    fetch(scriptUrl, {
+      method: 'POST',
+      body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+      if(data.status === "success") {
+        document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
+        document.getElementById('steps-indicator').style.opacity = '0';
+        var no = 'TW-' + Date.now().toString().slice(-6);
+        document.getElementById('success-no').textContent = '編號：' + no;
+        document.getElementById('success-screen').className = 'success-screen show';
+        window.scrollTo({top:0, behavior:'smooth'});
+      } else {
+        alert("❌ 發生錯誤：" + data.message);
+      }
+    })
+    .catch(error => {
+      alert("⚠️ 連線異常，請稍後再試。");
+    })
+    .finally(() => {
+      if(btn) { btn.innerText = originalText; btn.disabled = false; }
+    });
+  }
+
+  // ── 其他功能（重置、同行人員） ──
+  function resetForm() {
+    act=''; pay=''; companions=0; // 移除 lamps
+    document.getElementById('steps-indicator').style.opacity='1';
+    document.getElementById('success-screen').className = 'success-screen';
+    document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
+    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
+    document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
+    document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
+    goStep(1);
+  }
+
+  function togMS(btn){ btn.classList.toggle('sel'); }
+
+  function addCompanion() {
+    companions++;
+    var div = document.createElement('div');
+    div.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;padding:10px;background:#fff9f0;border-radius:8px;border:1px solid #e0d0b0;position:relative;';
+    div.innerHTML = `
+      <div class="form-group"><label>姓名</label><input type="text" placeholder="親友姓名"></div>
+      <div class="form-group"><label>電話</label><input type="text" placeholder="聯絡方式"></div>
+      <button onclick="remCompanion(this)" style="position:absolute;top:-8px;right:-8px;background:white;border:1px solid #c0392b;color:#c0392b;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:bold;">×</button>
+    `;
+    document.getElementById('companions-list').appendChild(div);
+  }
+
+  function remCompanion(btn) {
+    btn.parentElement.remove();
+    companions = Math.max(0, companions-1);
+  }
+
+  // ── 查詢功能大腦 ──
+  let activeIntervalsNative = [];
+  function updateBadgeColor(elementId, statusText) {
+    const el = document.getElementById(elementId);
+    el.innerText = statusText;
+    if (statusText.includes("報名") || statusText.includes("成功") || statusText.includes("完成") || statusText.includes("確認")) {
+      el.className = "query-badge badge-success";
+    } else {
+      el.className = "query-badge badge-pending";
+    }
+  }
+
+  function doNativeQuery() {
+    const phone = document.getElementById('queryPhoneInput').value.trim();
+    if (!phone) { alert("請輸入電話號碼"); return; }
+    
+    document.getElementById('queryLoading').style.display = 'block';
+    document.getElementById('queryResContainer').style.display = 'none';
+    document.getElementById('queryBtn').disabled = true;
+    activeIntervalsNative.forEach(clearInterval);
+
+    var queryUrl = "https://script.google.com/macros/s/AKfycbzV_OCBoPQmloCV0MHmy4YQj3Rad-6NsgnYNOElfe04TM4V_4SkSXQqoBzAoEBQe2nReQ/exec?phone=" + phone;
+
+    fetch(queryUrl)
+      .then(response => response.json())
+      .then(res => {
+        document.getElementById('queryLoading').style.display = 'none';
+        document.getElementById('queryBtn').disabled = false;
+        
+        if (res && res.found) {
+          document.getElementById('queryResContainer').style.display = 'block';
+          document.getElementById('queryResDisplayName').innerText = "信士/信女：" + res.name;
+          
+          if(res.light) {
+            document.getElementById('queryLightBox').style.display = 'block';
+            updateBadgeColor('lightBadgeNative', res.light.status);
+            document.getElementById('lightDateNativeArea').innerHTML = "<strong>有效期間：</strong><br>" + res.light.startStr + " ~ " + res.light.endStr;
+            startNativeTimer(res.light.deadline, 'countdownNative');
+          } else { document.getElementById('queryLightBox').style.display = 'none'; }
+
+          if(res.pilgrimage) {
+            document.getElementById('queryPilBox').style.display = 'block';
+            updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
+          } else { document.getElementById('queryPilBox').style.display = 'none'; }
+        } else {
+          alert("查無資料，請確認號碼是否正確");
+        }
+      })
+      .catch(err => {
+        document.getElementById('queryLoading').style.display = 'none';
+        document.getElementById('queryBtn').disabled = false;
+        alert("連線失敗：" + err.message);
+      });
+  }
+
+  function startNativeTimer(deadline, elementId) {
+    function update() {
+      const diff = deadline - new Date().getTime();
+      if (diff <= 0) { document.getElementById(elementId).innerText = "已到期"; return; }
+      const d = Math.floor(diff/86400000), h = Math.floor((diff%86400000)/3600000), m = Math.floor((diff%3600000)/60000), s = Math.floor((diff%60000)/1000);
+      document.getElementById(elementId).innerText = d+"天 "+h+"時 "+m+"分 "+s+"秒";
+    }
+    update();
+    activeIntervalsNative.push(setInterval(update, 1000));
+  }
+
+  // 管理員介面
+  function openAdminModal() { document.getElementById('admin-modal').className = 'modal-overlay show'; }
+  function closeModal() { document.getElementById('admin-modal').className = 'modal-overlay'; document.getElementById('pw-err').style.display='none'; }
+  function checkPw() {
+    if(document.getElementById('admin-pw').value === ADMIN_PW) {
+      isAdmin = true; closeModal(); document.getElementById('admin-bar').style.display = 'block'; alert('管理員登入成功！');
+    } else { document.getElementById('pw-err').style.display = 'block'; }
+  }
+  function adminLogout() {
+    isAdmin = false; document.getElementById('admin-bar').style.display = 'none'; document.getElementById('admin-pw').value = ''; alert('已登出');
+  }
+</script>
+</body>
+</html>
