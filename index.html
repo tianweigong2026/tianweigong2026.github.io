@@ -233,13 +233,13 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
         <div class="act-icon">🏮</div>
         <div class="act-title">進香報名</div>
         <div class="act-desc">隨駕進香活動<br>含交通、住宿安排</div>
-        <div class="act-price">$ 2,000 ／人</div>
+        <div class="act-price">$ 1,000 ／人</div>
       </div>
       <div class="act-card" id="act-dl" onclick="selAct('dl')">
         <div class="act-icon">🕯️</div>
         <div class="act-title">十二元神改厄燈</div>
         <div class="act-desc">點燈祈福消災<br>安排元神燈期</div>
-        <div class="act-price">$ 600 ／盞</div>
+        <div class="act-price">$ 1,200 ／人</div>
       </div>
     </div>
     <button class="btn-primary" onclick="goStep(2)">下一步 →</button>
@@ -429,7 +429,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
   var ADMIN_PW = 'tianwei2026';
   var isAdmin = false;
   var act = '', pay = '';
-  var companions = 0; // 移除 lamps 變數
+  var companions = 0; 
 
   // ── 頁面與步驟切換 ──
   function switchPage(pageId) {
@@ -490,9 +490,9 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var pm = {atm:'ATM 轉帳',line:'LINE Pay',street:'街口支付',onsite:'現場繳費'};
     var am = {jx:'進香報名',dl:'十二元神改厄燈'};
     
-    // 移除點燈數量，統一顯示數量或人數
-    var qty = isJx ? (1+companions)+' 人' : '1 盞';
-    var tot = isJx ? (1+companions)*2000 : 600;
+    // 計算總金額：進香每人1000，點燈每人1200
+    var qty = isJx ? (1+companions)+' 人' : '1 人';
+    var tot = isJx ? (1+companions)*1000 : 1200;
 
     document.getElementById('sum-type').textContent = am[act];
     document.getElementById('sum-name').textContent = name;
@@ -520,7 +520,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
       phone: isJx ? document.getElementById('jx-phone').value : document.getElementById('dl-phone').value,
       address: isJx ? document.getElementById('jx-addr').value : document.getElementById('dl-address').value,
-      birthday: isJx ? '' : document.getElementById('dl-lunar-birth').value, // 抓取農曆生日
+      birthday: isJx ? '' : document.getElementById('dl-lunar-birth').value, 
       plan: isJx ? '進香報名' : '十二元神改厄燈',
       payment: pm[pay] || '未選擇',
       companions: isJx ? companions : 0,
@@ -564,7 +564,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
 
   // ── 其他功能（重置、同行人員） ──
   function resetForm() {
-    act=''; pay=''; companions=0; // 移除 lamps
+    act=''; pay=''; companions=0; 
     document.getElementById('steps-indicator').style.opacity='1';
     document.getElementById('success-screen').className = 'success-screen';
     document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
