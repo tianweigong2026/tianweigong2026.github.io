@@ -548,7 +548,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)');
     var originalText = btn ? btn.innerText : '🙏 確認送出報名';
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
-
+//這邊重新部屬後，也要重新改入正確網址
     var scriptUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec";
 
     fetch(scriptUrl, {
@@ -629,7 +629,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('queryResContainer').style.display = 'none';
     document.getElementById('queryBtn').disabled = true;
     activeIntervalsNative.forEach(clearInterval);
-
+//如果有重新部屬，這邊也要改網址，改道exec那邊即可，後面?phone= 不用動
     var queryUrl = "https://script.google.com/macros/s/AKfycbzV_OCBoPQmloCV0MHmy4YQj3Rad-6NsgnYNOElfe04TM4V_4SkSXQqoBzAoEBQe2nReQ/exec?phone=" + phone;
 
     fetch(queryUrl)
