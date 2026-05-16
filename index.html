@@ -84,7 +84,7 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 /* PAYMENT */
 .pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
 .pay-card{border:1.5px solid var(--border);border-radius:10px;padding:12px;cursor:pointer;transition:all 0.2s;background:white;text-align:center}
-.pay-card:hover{border-color:var(--gold)}
+.pay-detail{background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
 .pay-card.selected{border-color:var(--gold);background:#fffde8;box-shadow:0 0 0 3px rgba(201,150,12,0.2)}
 .pay-icon{font-size:22px;margin-bottom:5px}
 .pay-name{font-size:12px;font-weight:700;color:var(--ink)}
@@ -582,7 +582,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('success-screen').className = 'success-screen';
     document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
     document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
-    document.querySelectorAll('.pay-detail').forEach(d=>d.classList.remove('show'));
+    var queryUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec" + phone;
     if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
     document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
     document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
