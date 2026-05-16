@@ -582,8 +582,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('success-screen').className = 'success-screen';
     document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
     document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
-    var queryUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec" + phone;
-    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
+    var queryUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec?phone=" + phone;    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
     document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
     document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
     goStep(1);
