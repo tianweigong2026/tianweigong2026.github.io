@@ -462,24 +462,40 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
 <!-- ══ 查詢頁 ══ -->
 <div class="page" id="page-query">
   <div class="section-title" style="margin-top:1.25rem">報名進度查詢</div>
+  
   <div class="card">
-    <div class="form-group" style="margin-bottom:10px">
-      <label>報名編號</label>
-      <input type="text" id="q-no" placeholder="請輸入編號，如：TW-240528">
-    </div>
     <div class="form-group" style="margin-bottom:14px">
-      <label>報名人電話後 4 碼驗證</label>
-      <input type="tel" id="q-phone" placeholder="後4碼" maxlength="4">
+      <label>請輸入您的完整電話號碼</label>
+      <input type="tel" id="queryPhoneInput" placeholder="例如：0912345678" onkeypress="if(event.keyCode==13) doNativeQuery()">
     </div>
-    <button class="btn-primary" onclick="queryStatus()" style="letter-spacing:2px;font-size:13px">🔍 查詢進度</button>
-    <div class="query-result" id="q-result">
-      <div class="fsec-title" style="margin-bottom:8px">查詢結果</div>
-      <div class="res-row"><span class="res-key">報名編號</span><span class="res-val">TW-240528</span></div>
-      <div class="res-row"><span class="res-key">活動類型</span><span class="res-val">進香報名</span></div>
-      <div class="res-row"><span class="res-key">報名人</span><span class="res-val">王○○</span></div>
-      <div class="res-row"><span class="res-key">付款方式</span><span class="res-val">ATM 轉帳</span></div>
-      <div class="res-row"><span class="res-key">付款狀態</span><span class="res-val"><span class="badge ok">已確認</span></span></div>
-      <div class="res-row"><span class="res-key">報名狀態</span><span class="res-val"><span class="badge ok">✓ 報名成功</span></span></div>
+    <button class="btn-primary" id="queryBtn" onclick="doNativeQuery()" style="letter-spacing:2px;font-size:13px">🔍 查詢進度</button>
+    
+    <div id="queryLoading" style="display:none; text-align:center; color:var(--red); font-size:12px; margin-top:12px; font-weight:700; font-family:'Noto Sans TC',sans-serif;">資料連線中...</div>
+  </div>
+
+  <div id="queryResContainer" style="display:none; margin-top:1rem;">
+    <div class="info-notice" id="queryResName" style="text-align:center; font-size:14px; font-weight:700; color:var(--red); margin-bottom:10px;"></div>
+
+    <div id="queryLightBox" class="card" style="display:none; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;">
+        <span style="font-size:14px; font-weight:700; color:var(--ink);">十二元神點燈</span>
+        <span id="lightBadgeNative" class="badge"></span>
+      </div>
+      <div style="font-size:12px; color:var(--ink-muted); line-height:1.6; font-family:'Noto Sans TC',sans-serif;">
+        <strong style="color:var(--ink);">有效期間：</strong><br><span id="lightDateNative"></span>
+      </div>
+      <div style="background:#fffde8; border:1px dashed var(--gold); border-radius:8px; padding:10px; margin-top:12px; text-align:center;">
+        <div style="font-size:11px; color:var(--ink-muted); margin-bottom:4px; font-family:'Noto Sans TC',sans-serif;">距離燈期截止剩餘</div>
+        <div id="countdownNative" style="font-size:16px; font-weight:700; color:var(--red); font-family:monospace;"></div>
+      </div>
+    </div>
+
+    <div id="queryPilBox" class="card" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:10px;">
+        <span style="font-size:14px; font-weight:700; color:var(--ink);">丁未年進香報名</span>
+        <span id="pilBadgeNative" class="badge"></span>
+      </div>
+      <p style="font-size:12px; color:var(--ink-muted); margin-top:8px; font-family:'Noto Sans TC',sans-serif;">您已完成進香登記，期待您的參與。</p>
     </div>
   </div>
 </div>
