@@ -550,7 +550,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
     // 📌 【位置一：報名送出網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec";
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbxRThKGqT5hV_p3pTkv1xDRWbGkhqycI3l1H3ks_NLm7HPR2BeDFmMWhhQshxq4UcdIOQ/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
@@ -582,8 +582,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('success-screen').className = 'success-screen';
     document.querySelectorAll('.act-card').forEach(c=>c.classList.remove('selected'));
     document.querySelectorAll('.pay-card').forEach(c=>c.classList.remove('selected'));
-    var queryUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec?phone=" + phone;    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
-    document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
+    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';    document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
     document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
     goStep(1);
   }
@@ -629,7 +628,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     activeIntervalsNative.forEach(clearInterval);
 
     // 📌 【位置二：進度查詢網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var queryUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec?phone=" + phone;
+    var queryUrl = "https://script.google.com/macros/s/AKfycbxRThKGqT5hV_p3pTkv1xDRWbGkhqycI3l1H3ks_NLm7HPR2BeDFmMWhhQshxq4UcdIOQ/exec?phone=" + phone;
 
     fetch(queryUrl)
       .then(response => response.json())
