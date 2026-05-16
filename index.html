@@ -448,7 +448,6 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
   function goStep(n) {
     if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
     
-    // 檢查從 Step 2 前往 Step 3 的必填欄位
     if (n === 3) {
       var isJx = (act === 'jx');
       if (isJx) {
@@ -551,7 +550,8 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var originalText = btn ? btn.innerText : '🙏 確認送出報名';
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbz89puDCq1xq_81Qwzq380fbY-EMGDJQonalgfxDFHNjjE_g95iX57NYVMhnD80yY6xMw/exec";
+    // 已經替換為您最新部署的網址！
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
