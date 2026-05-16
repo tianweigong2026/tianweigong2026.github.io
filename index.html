@@ -89,7 +89,7 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 .pay-icon{font-size:22px;margin-bottom:5px}
 .pay-name{font-size:12px;font-weight:700;color:var(--ink)}
 .pay-desc{font-size:10px;color:var(--ink-muted);margin-top:2px;font-family:'Noto Sans TC',sans-serif}
-.pay-detail{background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
+.pay-detail(background:#fffde8;border:1px solid var(--gold);border-radius:10px;padding:1rem;margin-top:8px;display:none}
 .pay-detail.show{display:block}
 .pay-detail-title{font-size:12px;color:var(--gold-dark);font-weight:700;margin-bottom:8px;font-family:'Noto Sans TC',sans-serif}
 .bank-info{font-size:12px;color:var(--ink);line-height:2.2;font-family:'Noto Sans TC',sans-serif}
@@ -123,7 +123,6 @@ nav{background:#1a0505;display:flex;border-bottom:2px solid var(--gold);position
 .success-screen.show{display:block}
 .success-icon{font-size:56px;margin-bottom:1rem}
 .success-title{font-size:22px;color:var(--red);font-weight:700;letter-spacing:5px;margin-bottom:8px}
-.success-no{font-size:20px;color:var(--gold-dark);font-weight:700;margin:1rem 0;letter-spacing:3px;font-family:'Noto Sans TC',sans-serif}
 .success-sub{font-size:12px;color:var(--ink-muted);line-height:2;font-family:'Noto Sans TC',sans-serif}
 
 /* STEP FORM */
@@ -368,7 +367,6 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
   <div class="success-screen" id="success-screen">
     <div class="success-icon">🎉</div>
     <div class="success-title">報名登記成功</div>
-    <div class="success-no" id="success-no">編號：TW-000000</div>
     <div class="success-sub">感謝信士/信女的虔誠登記。<br>請記得完成匯款或現場繳費。<br>廟方核對後將立刻開展服務！</div>
     <button class="btn-primary" style="margin-top:2rem;max-width:200px" onclick="resetForm()">返回報名首頁</button>
   </div>
@@ -448,6 +446,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
   function goStep(n) {
     if (n === 2 && !act) { alert('請先選擇報名項目！'); return; }
     
+    // 檢查從 Step 2 前往 Step 3 的必填欄位
     if (n === 3) {
       var isJx = (act === 'jx');
       if (isJx) {
@@ -550,7 +549,6 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var originalText = btn ? btn.innerText : '🙏 確認送出報名';
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
-    // 已經替換為您最新部署的網址！
     var scriptUrl = "https://script.google.com/macros/s/AKfycbxg32eG-59M4rUXnzkBuJE5U6KQ4-a-9pnYht4ExarOnGdG3xyA_mgfZPxtHB555rH2Cg/exec";
 
     fetch(scriptUrl, {
@@ -562,8 +560,8 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       if(data.status === "success") {
         document.querySelectorAll('.step-form').forEach(f => f.classList.remove('active'));
         document.getElementById('steps-indicator').style.opacity = '0';
-        var no = 'TW-' + Date.now().toString().slice(-6);
-        document.getElementById('success-no').textContent = '編號：' + no;
+        
+        // 修改此處：移除產生隨機編號的邏輯，直接秀出乾淨畫面
         document.getElementById('success-screen').className = 'success-screen show';
         window.scrollTo({top:0, behavior:'smooth'});
       } else {
@@ -662,7 +660,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       .catch(err => {
         document.getElementById('queryLoading').style.display = 'none';
         document.getElementById('queryBtn').disabled = false;
-        alert("連線失敗：" + err.message);
+        alert("連線失敗裝狀態：" + err.message);
       });
   }
 
