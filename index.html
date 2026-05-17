@@ -181,7 +181,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     <div class="modal-sub">請輸入管理員密碼</div>
     <input type="password" class="modal-input" id="admin-pw" placeholder="••••••" maxlength="30" onkeydown="if(event.key==='Enter')checkPw()">
     <div class="modal-err" id="pw-err">❌ 密碼錯誤，請再試一次</div>
-    <div class="modal-btn" onclick="checkPw()">進入管理介面</div>
+    <button class="modal-btn" onclick="checkPw()">進入管理介面</button>
     <button class="modal-cancel" onclick="closeModal()">取消</button>
   </div>
 </div>
@@ -247,7 +247,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           <div class="form-group"><label>聯絡電話 <span class="req">*</span></label><input type="tel" id="jx-phone" placeholder="手機電話號碼"></div>
         </div>
         <div class="form-row full">
-          <div class="form-group"><label>居住住址 <span class="req">*</span></label><input type="text" id="jx-addr" placeholder="完整居住地址"></div>
+          <div class="form-group"><label>居住住址 <span class="req">*</span></label><input type="text" id="jx-addr" placeholder="完整居住地址（代寫疏文用）"></div>
         </div>
       </div>
       <div class="card">
@@ -258,7 +258,6 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
             <select id="jx-size">
               <option value="S">S</option><option value="M">M</option><option value="L">L</option>
               <option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option>
-              <option value="4XL">4XL</option><option value="5XL">5XL</option></option><option value="6XL">6XL</option>
             </select>
           </div>
           <div class="form-group">
@@ -283,7 +282,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
         </div>
       </div>
       <div class="card">
-        <div class="fsec-title">👥 同行親友</div>
+        <div class="fsec-title">👥 同行親友 (若有同行家人，請點下方新增)</div>
         <div id="companions-list"></div>
         <button class="btn-secondary" style="width:100%;margin-top:5px" onclick="addCompanion()">＋ 新增同行親友</button>
       </div>
@@ -439,7 +438,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.getElementById('act-' + id).classList.add('selected');
   }
 
-  // 控制身分證欄位的隱藏與顯示
+  // 控制主報名人身分證欄位的隱藏與顯示
   function toggleIdField() {
     var bus = document.getElementById('jx-bus').value;
     var idGroup = document.getElementById('id-card-group');
@@ -448,6 +447,17 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     } else {
       idGroup.style.display = 'none';
       document.getElementById('jx-idcard').value = '';
+    }
+  }
+
+  // 智慧連動：控制個別親友的身分證字號欄位隱藏與顯示
+  function toggleCompIdField(selectEl) {
+    var idGroup = selectEl.parentElement.parentElement.nextElementSibling;
+    if (selectEl.value === '跟著坐遊覽車') {
+      idGroup.style.display = 'block';
+    } else {
+      idGroup.style.display = 'none';
+      idGroup.querySelector('.comp-idcard').value = '';
     }
   }
 
@@ -464,12 +474,29 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           alert('請填寫所有必填（*）欄位：包含姓名、手機與住址！'); 
           return; 
         }
-        // 🚨 防呆攔截：若搭遊覽車卻沒填身分證字號，直接阻擋
+        
+        // 🚨 防呆攔截：若主報名人搭遊覽車卻沒填身分證字號，直接阻擋
         var bus = document.getElementById('jx-bus').value;
         var idcard = document.getElementById('jx-idcard').value.trim();
         if (bus === '跟著坐遊覽車' && !idcard) {
-          alert('請填寫身分證字號以利辦理遊覽車保險！');
+          alert('請填寫主報名人的身分證字號以利辦理遊覽車保險！');
           return;
+        }
+
+        // 🚨 防呆攔截：個別檢查同行親友的必填與遊覽車身分證
+        var compBlocks = document.querySelectorAll('.companion-block');
+        for (var i = 0; i < compBlocks.length; i++) {
+          var cName = compBlocks[i].querySelector('.comp-name').value.trim();
+          var cBus = compBlocks[i].querySelector('.comp-bus').value;
+          var cId = compBlocks[i].querySelector('.comp-idcard').value.trim();
+          if (!cName) {
+            alert('請填寫第 ' + (i + 1) + ' 位親友的姓名！');
+            return;
+          }
+          if (cBus === '跟著坐遊覽車' && !cId) {
+            alert('請填寫親友【' + cName + '】的身分證字號以利辦理保險！');
+            return;
+          }
         }
       } else {
         var name = document.getElementById('dl-name').value.trim();
@@ -540,8 +567,24 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var busEl = document.getElementById('jx-bus');
     var idcardEl = document.getElementById('jx-idcard');
     
-    // 如果是搭大巴就抓取身分證字號，如果是自行前往就傳「無」
-    var idcardVal = (busEl && busEl.value === '跟著坐遊覽車') ? idcardEl.value.trim() : '無';
+    // 🧠 核心：打包並格式化所有同行親友的詳細資料
+    var compBlocks = document.querySelectorAll('.companion-block');
+    var compDetailsArray = [];
+    compBlocks.forEach(function(block) {
+      var cName = block.querySelector('.comp-name').value.trim();
+      var cPhone = block.querySelector('.comp-phone').value.trim() || '無電話';
+      var cBus = block.querySelector('.comp-bus').value;
+      var cId = block.querySelector('.comp-idcard').value.trim() || '無';
+      compDetailsArray.push(cName + "(" + cPhone + "/" + cBus + "/ID:" + cId + ")");
+    });
+    var compFullText = compDetailsArray.join(" | ");
+
+    // 整合主報名人身分證與所有親友資訊，一起塞進第 I 欄
+    var mainId = (busEl && busEl.value === '跟著坐遊覽車') ? idcardEl.value.trim() : '無';
+    var finalIdColumnValue = "主ID: " + mainId;
+    if (compFullText) {
+      finalIdColumnValue += " 👥 親友明細: " + compFullText;
+    }
 
     var formData = {
       name: isJx ? document.getElementById('jx-name').value : document.getElementById('dl-name').value,
@@ -552,7 +595,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       payment: pm[pay] || '未選擇',
       companions: isJx ? companions : 0,
       
-      jxType: isJx ? idcardVal : '無', // 📌 精準對接：直接把身分證字號傳入試算表的第 I 欄！
+      jxType: isJx ? finalIdColumnValue : '無', // 📌 塞進第 I 欄
       size: sizeEl ? sizeEl.value : '未選擇',
       food: foodEl ? foodEl.value : '未選擇',
       bus: busEl ? busEl.value : '未選擇'
@@ -600,20 +643,33 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     document.querySelectorAll('input[type="text"], input[type="tel"]').forEach(i => i.value = '');
     document.querySelectorAll('select').forEach(s => s.selectedIndex = 0);
     
-    // 乾淨重置新增的欄位狀態
     if(document.getElementById('jx-idcard')) document.getElementById('jx-idcard').value = '';
     if(document.getElementById('id-card-group')) document.getElementById('id-card-group').style.display = 'block';
     
+    if(document.getElementById('companions-list')) document.getElementById('companions-list').innerHTML='';
     goStep(1);
   }
 
   function addCompanion() {
     companions++;
     var div = document.createElement('div');
-    div.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;padding:10px;background:#fff9f0;border-radius:8px;border:1px solid #e0d0b0;position:relative;';
+    div.className = 'companion-block';
+    div.style.cssText='display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding:12px;background:#fff9f0;border-radius:8px;border:1px solid #e0d0b0;position:relative;';
     div.innerHTML = `
-      <div class="form-group"><label>姓名</label><input type="text" placeholder="親友姓名"></div>
-      <div class="form-group"><label>電話</label><input type="text" placeholder="聯絡方式"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div class="form-group"><label>親友姓名 <span class="req">*</span></label><input type="text" class="comp-name" placeholder="姓名"></div>
+        <div class="form-group"><label>親友電話</label><input type="text" class="comp-phone" placeholder="電話(選填)"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr;gap:10px;">
+        <div class="form-group">
+          <label>親友交通方式 <span class="req">*</span></label>
+          <select class="comp-bus" onchange="toggleCompIdField(this)">
+            <option value="跟著坐遊覽車">跟著坐遊覽車</option>
+            <option value="自行前往">自行前往</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group comp-id-group"><label>親友身分證字號 <span class="req">*</span> (申請遊覽車保險使用)</label><input type="text" class="comp-idcard" placeholder="請輸入身分證字號"></div>
       <button onclick="remCompanion(this)" style="position:absolute;top:-8px;right:-8px;background:white;border:1px solid #c0392b;color:#c0392b;width:24px;height:24px;border-radius:50%;cursor:pointer;font-weight:bold;">×</button>
     `;
     document.getElementById('companions-list').appendChild(div);
