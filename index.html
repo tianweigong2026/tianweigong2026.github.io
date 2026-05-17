@@ -571,7 +571,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     var busEl = document.getElementById('jx-bus');
     var idcardEl = document.getElementById('jx-idcard');
     
-    // 🧠 核心：打包並格式化所有同行親友的詳細資料
+  // 🧠 核心：打包並格式化所有同行親友的詳細資料
     var compBlocks = document.querySelectorAll('.companion-block');
     var compDetailsArray = [];
     compBlocks.forEach(function(block) {
@@ -583,11 +583,12 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     });
     var compFullText = compDetailsArray.join(" | ");
 
-    // 整合主報名人身分證與所有親友資訊，一起塞進第 I 欄
-    var mainId = (busEl && busEl.value === '跟著坐遊覽車') ? idcardEl.value.trim() : '無';
-    var finalIdColumnValue = "主ID: " + mainId;
+    // ✨ 完美升級：整合主報名人的「交通方式」與「身分證」，讓您跟信徒一秒看懂！
+    var mainBusVal = busEl ? busEl.value : '自行前往';
+    var mainId = (mainBusVal === '跟著坐遊覽車') ? idcardEl.value.trim() : '無';
+    var finalIdColumnValue = "主交通: " + mainBusVal + " (ID: " + mainId + ")";
     if (compFullText) {
-      finalIdColumnValue += " 👥 親友明細: " + compFullText;
+      finalIdColumnValue += " | 👥 親友明細: " + compFullText;
     }
 
     var formData = {
@@ -599,11 +600,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       payment: pm[pay] || '未選擇',
       companions: isJx ? companions : 0,
       
-      jxType: isJx ? finalIdColumnValue : '無', // 📌 塞進第 I 欄
-      size: sizeEl ? sizeEl.value : '未選擇',
-      food: foodEl ? foodEl.value : '未選擇',
-      bus: busEl ? busEl.value : '未選擇'
-    };
+      jxType: isJx ? finalIdColumnValue : '無', // 📌 精準合併塞進試算表第 I 欄
 
     var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)');
     var originalText = btn ? btn.innerText : '🙏 確認送出報名';
