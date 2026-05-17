@@ -599,8 +599,12 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
       plan: isJx ? '進香報名' : '十二元神改厄燈',
       payment: pm[pay] || '未選擇',
       companions: isJx ? companions : 0,
-      
-      jxType: isJx ? finalIdColumnValue : '無', // 📌 精準合併塞進試算表第 I 欄
+
+      jxType: isJx ? finalIdColumnValue : '無', 
+      size: sizeEl ? sizeEl.value : '未選擇',
+      food: foodEl ? foodEl.value : '未選擇',
+      bus: busEl ? busEl.value : '未選擇'
+    };
 
     var btn = document.querySelector('#sf4 .btn-primary:nth-child(2)');
     var originalText = btn ? btn.innerText : '🙏 確認送出報名';
@@ -751,21 +755,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
             }
           } else { document.getElementById('queryPilBox').style.display = 'none'; }
 
-          if(res.pilgrimage) {
-            document.getElementById('queryPilBox').style.display = 'block';
-            updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
-
-            // ✨ 新增：解開後台傳回來的親友與身分證資料，並自動換行排版
-            var detailsEl = document.getElementById('pilDetailsArea');
-            if (res.pilgrimage.details && res.pilgrimage.details !== '無') {
-              detailsEl.style.display = 'block';
-              // 把資料庫裡的 | 符號，轉換成網頁的換行，讓排版更漂亮漂亮
-              var formattedDetails = res.pilgrimage.details.replace(/ \| /g, '<br>➡️ ');
-              detailsEl.innerHTML = "<strong>📋 報名人員與保險資料明細：</strong><br>➡️ " + formattedDetails;
-            } else {
-              detailsEl.style.display = 'none';
-            }
-          } else { document.getElementById('queryPilBox').style.display = 'none'; }
+          
         } else {
           alert("查無資料，請確認號碼是否正確");
         }
