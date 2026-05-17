@@ -386,6 +386,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           <span id="lightBadgeNative" class="query-badge"></span>
         </div>
         <div id="lightDateNativeArea" style="font-size: 0.9rem; margin-top: 10px; color:#333;"></div>
+        <div id="lightAmountArea" style="font-size: 0.9rem; margin-top: 6px; color: #8B1A1A; font-weight: bold;"></div>
         <div class="query-timer">距離截止剩餘：<br><span id="countdownNative"></span></div>
       </div>
 
@@ -395,6 +396,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           <span id="pilBadgeNative" class="query-badge"></span>
         </div>
         <p style="font-size: 0.9rem; margin-top: 10px; color: #555;">您已完成登記，期待與您參與盛事。</p>
+        <div id="pilAmountArea" style="font-size: 0.9rem; margin-top: 6px; color: #8B1A1A; font-weight: bold; margin-bottom: 8px;"></div>
         <div id="pilDetailsArea" style="font-size: 0.85rem; margin-top: 12px; color: #2c1810; border-top: 1px dashed rgba(139,26,26,0.3); padding-top: 8px; line-height: 1.8; display:none;"></div>
       </div>
     </div>
@@ -608,7 +610,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
     // 📌 【位置一：報名送出網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbyFV-f97ZCl19oRGhWKUzOVdmq9vk6lwRDyQFPFrtq6TxIVz8XADrAyncRXAHKpn1LyWg/exec";
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbxJcwGuZt0yEMqEhh-Cd7T9OIlWR3Hjcvi4lHTLJSgEh8cPt6Hla7l4I7rK04iFw1MzqQ/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
@@ -704,7 +706,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     activeIntervalsNative.forEach(clearInterval);
 
     // 📌 【位置二：進度查詢網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var queryUrl = "https://script.google.com/macros/s/AKfycbyFV-f97ZCl19oRGhWKUzOVdmq9vk6lwRDyQFPFrtq6TxIVz8XADrAyncRXAHKpn1LyWg/exec?phone=" + phone;
+    var queryUrl = "https://script.google.com/macros/s/AKfycbxJcwGuZt0yEMqEhh-Cd7T9OIlWR3Hjcvi4lHTLJSgEh8cPt6Hla7l4I7rK04iFw1MzqQ/exec?phone=" + phone;
 
     fetch(queryUrl)
       .then(response => response.json())
@@ -720,8 +722,37 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
             document.getElementById('queryLightBox').style.display = 'block';
             updateBadgeColor('lightBadgeNative', res.light.status);
             document.getElementById('lightDateNativeArea').innerHTML = "<strong>有效期間：</strong><br>" + res.light.startStr + " ~ " + res.light.endStr;
+            
+            // ✨ 新增：抓取並秀出點燈應付金額
+            if(res.light.amount) {
+              document.getElementById('lightAmountArea').innerHTML = "<strong>💰 應付總金額：</strong>$" + Number(res.light.amount).toLocaleString() + " 元";
+            } else {
+              document.getElementById('lightAmountArea').innerHTML = "";
+            }
             startNativeTimer(res.light.deadline, 'countdownNative');
           } else { document.getElementById('queryLightBox').style.display = 'none'; }
+
+          if(res.pilgrimage) {
+            document.getElementById('queryPilBox').style.display = 'block';
+            updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
+            
+            // ✨ 新增：抓取並秀出進香應付金額
+            if(res.pilgrimage.amount) {
+              document.getElementById('pilAmountArea').innerHTML = "<strong>💰 應付總金額：</strong>$" + Number(res.pilgrimage.amount).toLocaleString() + " 元";
+            } else {
+              document.getElementById('pilAmountArea').innerHTML = "";
+            }
+
+            // ✨ 新增：解開親友保險明細串
+            var detailsEl = document.getElementById('pilDetailsArea');
+            if (res.pilgrimage.details && res.pilgrimage.details !== '無') {
+              detailsEl.style.display = 'block';
+              var formattedDetails = res.pilgrimage.details.replace(/ \| /g, '<br>➡️ ');
+              detailsEl.innerHTML = "<strong>📋 報名人員與保險資料明細：</strong><br>➡️ " + formattedDetails;
+            } else {
+              detailsEl.style.display = 'none';
+            }
+          } else { document.getElementById('queryPilBox').style.display = 'none'; }
 
           if(res.pilgrimage) {
             document.getElementById('queryPilBox').style.display = 'block';
