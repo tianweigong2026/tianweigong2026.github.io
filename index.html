@@ -611,7 +611,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
     // 📌 【位置一：報名送出網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbxJcwGuZt0yEMqEhh-Cd7T9OIlWR3Hjcvi4lHTLJSgEh8cPt6Hla7l4I7rK04iFw1MzqQ/exec";
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbz6U-1VogvrhwqgchVvIc1P6B-RsVa_ZVur9dV8pumd2Lgdrg3MMhcE1XODEQFT-HPHDw/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
@@ -707,7 +707,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     activeIntervalsNative.forEach(clearInterval);
 
     // 📌 【位置二：進度查詢網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var queryUrl = "https://script.google.com/macros/s/AKfycbxJcwGuZt0yEMqEhh-Cd7T9OIlWR3Hjcvi4lHTLJSgEh8cPt6Hla7l4I7rK04iFw1MzqQ/exec?phone=" + phone;
+    var queryUrl = "https://script.google.com/macros/s/AKfycbz6U-1VogvrhwqgchVvIc1P6B-RsVa_ZVur9dV8pumd2Lgdrg3MMhcE1XODEQFT-HPHDw/exec?phone=" + phone;
 
     fetch(queryUrl)
       .then(response => response.json())
