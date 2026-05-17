@@ -395,6 +395,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           <span id="pilBadgeNative" class="query-badge"></span>
         </div>
         <p style="font-size: 0.9rem; margin-top: 10px; color: #555;">您已完成登記，期待與您參與盛事。</p>
+        <div id="pilDetailsArea" style="font-size: 0.85rem; margin-top: 12px; color: #2c1810; border-top: 1px dashed rgba(139,26,26,0.3); padding-top: 8px; line-height: 1.8; display:none;"></div>
       </div>
     </div>
   </div>
@@ -607,7 +608,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     if(btn) { btn.innerText = "資料傳送中..."; btn.disabled = true; }
 
     // 📌 【位置一：報名送出網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var scriptUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec";
+    var scriptUrl = "https://script.google.com/macros/s/AKfycbyFV-f97ZCl19oRGhWKUzOVdmq9vk6lwRDyQFPFrtq6TxIVz8XADrAyncRXAHKpn1LyWg/exec";
 
     fetch(scriptUrl, {
       method: 'POST',
@@ -703,7 +704,7 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
     activeIntervalsNative.forEach(clearInterval);
 
     // 📌 【位置二：進度查詢網址】未來若是 Apps Script 有重新部署拿到新網址，請更換下面這行引號內的網址
-    var queryUrl = "https://script.google.com/macros/s/AKfycbw5nb3U9JSwQUE_mmw66VpIREP1xY4ofmQDNqoaqdM6vhNp8GsOlJhVLbHrjCyLLFR92Q/exec?phone=" + phone;
+    var queryUrl = "https://script.google.com/macros/s/AKfycbyFV-f97ZCl19oRGhWKUzOVdmq9vk6lwRDyQFPFrtq6TxIVz8XADrAyncRXAHKpn1LyWg/exec?phone=" + phone;
 
     fetch(queryUrl)
       .then(response => response.json())
@@ -725,6 +726,17 @@ footer{text-align:center;padding:1.5rem 1rem 2.5rem;background:#1a0505;color:rgb
           if(res.pilgrimage) {
             document.getElementById('queryPilBox').style.display = 'block';
             updateBadgeColor('pilBadgeNative', res.pilgrimage.status);
+
+            // ✨ 新增：解開後台傳回來的親友與身分證資料，並自動換行排版
+            var detailsEl = document.getElementById('pilDetailsArea');
+            if (res.pilgrimage.details && res.pilgrimage.details !== '無') {
+              detailsEl.style.display = 'block';
+              // 把資料庫裡的 | 符號，轉換成網頁的換行，讓排版更漂亮漂亮
+              var formattedDetails = res.pilgrimage.details.replace(/ \| /g, '<br>➡️ ');
+              detailsEl.innerHTML = "<strong>📋 報名人員與保險資料明細：</strong><br>➡️ " + formattedDetails;
+            } else {
+              detailsEl.style.display = 'none';
+            }
           } else { document.getElementById('queryPilBox').style.display = 'none'; }
         } else {
           alert("查無資料，請確認號碼是否正確");
